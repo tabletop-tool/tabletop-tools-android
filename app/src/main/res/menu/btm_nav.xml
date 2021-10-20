@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/coin_flip"
+        android:title="@string/coin_flip"
+        android:icon="@drawable/ic_baseline_monetization_on_24"/>
+
+    <item android:id="@+id/dice"
+        android:title="@string/dice"
+        android:icon="@drawable/ic_baseline_drag_indicator_24"/>
+
+    <item android:id="@+id/spinner"
+        android:title="@string/spinner"
+        android:icon="@drawable/ic_baseline_rotate_right_24"/>
+
+    <item android:id="@+id/guides"
+        android:title="@string/guides"
+        android:icon="@drawable/ic_baseline_library_books_24"/>
+
+    <item android:id="@+id/more_options"
+        android:title="@string/more_options"
+        android:icon="@drawable/ic_baseline_more_horiz_24"/>
+
+</menu>

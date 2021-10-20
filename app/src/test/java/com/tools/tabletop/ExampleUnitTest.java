@@ -1,4 +1,4 @@
-package com.tabletop.tools;
+package com.tools.tabletop;
 
 import org.junit.Test;
 

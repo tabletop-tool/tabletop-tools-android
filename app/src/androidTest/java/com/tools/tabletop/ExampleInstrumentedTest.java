@@ -1,4 +1,4 @@
-package com.tabletop.tools;
+package com.tools.tabletop;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.tabletop.tools", appContext.getPackageName());
+        assertEquals("com.tools.tabletop", appContext.getPackageName());
     }
 }
