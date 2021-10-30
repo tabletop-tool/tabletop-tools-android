@@ -9,4 +9,6 @@
 
     <string name='h'>Head</string>
     <string name="t">Tail</string>
+
+    <string name="ready_to_flip">Ready To Roll</string>
 </resources>

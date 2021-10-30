@@ -1,5 +1,6 @@
 package com.tools.tabletop;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,6 +12,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
 
 import java.util.Random;
 
@@ -24,24 +28,34 @@ public class CoinFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_coin, container, false);
 
-        flipBtn = v.findViewById(R.id.coin_btn);
-        flipBtn.setOnClickListener(v1 -> {
+        this.flipBtn = v.findViewById(R.id.coin_btn);
+        this.flipBtn.setOnClickListener(v1 -> {
             if (v1.getId() != R.id.coin_btn) return;
 
             int temp = rand.nextInt(2);
-            if (result != temp) {
-                result = temp;
-                if (temp == 1) {
-                    flipBtn.setBackgroundColor(Color.parseColor("#0984e3"));
-                    flipBtn.setText(getString(R.string.h));
-                } else {
-                    flipBtn.setBackgroundColor(Color.parseColor("#00cec9"));
-                    flipBtn.setText(getString(R.string.t));
-                }
+            if (this.result != temp) {
+                this.result = temp;
+                this.changeBtn();
                 Toast.makeText(v1.getContext(), "Coin Flipped!", Toast.LENGTH_SHORT).show();
             }
         });
 
         return v;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (this.result != -1) this.changeBtn();
+    }
+
+    private void changeBtn() {
+        if (this.result == 1) {
+            flipBtn.setBackgroundColor(Color.parseColor("#0984e3"));
+            flipBtn.setText(getString(R.string.h));
+        } else {
+            flipBtn.setBackgroundColor(Color.parseColor("#00cec9"));
+            flipBtn.setText(getString(R.string.t));
+        }
     }
 }
