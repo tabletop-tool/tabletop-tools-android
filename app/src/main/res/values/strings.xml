@@ -5,4 +5,8 @@
     <string name="spinner">Spinner</string>
     <string name="guides">Guides</string>
     <string name="more_options">More Options</string>
+    <string name="click_me">Click Me!</string>
+
+    <string name='h'>Head</string>
+    <string name="t">Tail</string>
 </resources>
