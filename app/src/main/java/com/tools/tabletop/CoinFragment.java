@@ -16,7 +16,7 @@ import java.util.Random;
 
 public class CoinFragment extends Fragment {
     private int result = -1;
-    private final Random rand = new Random();
+    private static final Random rand = new Random();
     private Button flipBtn;
 
     @Nullable

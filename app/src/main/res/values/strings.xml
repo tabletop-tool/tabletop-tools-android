@@ -11,4 +11,6 @@
     <string name="t">Tail</string>
 
     <string name="ready_to_flip">Ready To Roll</string>
+
+    <string name="pointer_for_user_visual">Pointer for user visual</string>
 </resources>

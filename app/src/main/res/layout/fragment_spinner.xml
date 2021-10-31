@@ -1,18 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/frg_spin"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Spinner Fragment"
-        android:textSize="24sp"
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/circular"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/pointer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/pointer_for_user_visual"
+        android:src="@drawable/pointer"
+        app:layout_constraintBottom_toBottomOf="@+id/circular"
+        app:layout_constraintEnd_toEndOf="@+id/circular"
+        app:layout_constraintStart_toStartOf="@+id/circular"
+        app:layout_constraintTop_toTopOf="@+id/circular" />
+
+    <Button
+        android:id="@+id/cir_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="60sp"
+        app:cornerRadius="90dp"
+        app:layout_constraintBottom_toBottomOf="@+id/pointer"
+        app:layout_constraintStart_toStartOf="@+id/pointer"
+        app:layout_constraintEnd_toEndOf="@+id/pointer"
+        app:layout_constraintTop_toTopOf="@+id/pointer" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
