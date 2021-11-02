@@ -39,12 +39,18 @@ public class DiceFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (this.result != null) this.changeDice();
+        if (this.result != null) this.changeDice(false);
+    }
+
+    private void changeDice(boolean change) {
+        if (change)
+            this.result = rand.nextInt(this.range[1] - this.range[0] + 1) + this.range[0];
+
+        dice.setText(String.valueOf(this.result));
+        if (dice.getTextSize() != 80) dice.setTextSize(80);
     }
 
     private void changeDice() {
-        this.result = rand.nextInt(this.range[1] - this.range[0] + 1) + this.range[0];
-        dice.setText(String.valueOf(this.result));
-        if (dice.getTextSize() != 80) dice.setTextSize(80);
+        this.changeDice(true);
     }
 }
