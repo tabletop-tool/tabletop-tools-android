@@ -68,10 +68,17 @@ public class SpinnerFragment extends Fragment implements View.OnClickListener, A
 
     private void loadPieChart() {
         // code reference: https://youtu.be/S3zqxVoIUig
-        pe.add(new PieEntry(50f, "Red"));
-        pe.add(new PieEntry(50f, "Blue"));
+        pe.add(new PieEntry(25f, "Red"));
+        pe.add(new PieEntry(25f, "Blue"));
         colors.add(Color.parseColor("#d63031"));
         colors.add(Color.parseColor("#0984e3"));
+
+        // the default
+        float remain = 100f;
+        for (PieEntry i: pe)
+            remain -= i.getValue();
+        pe.add(new PieEntry(remain, "Default"));
+        colors.add(Color.parseColor("#b2bec3"));
 
         PieDataSet pds = new PieDataSet(pe, "Custom");
         pds.setColors(colors);
