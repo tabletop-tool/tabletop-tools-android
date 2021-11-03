@@ -24,6 +24,8 @@ public class PointsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_points, container, false);
 
+        // Some code from: https://youtu.be/xYmH61Ilglc
+
         this.rv = v.findViewById(R.id.pts_list);
         this.data = new ArrayList<>();
 
