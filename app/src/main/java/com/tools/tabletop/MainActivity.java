@@ -22,13 +22,14 @@ public class MainActivity extends AppCompatActivity {
             put(R.id.coin_flip, new CoinFragment());
             put(R.id.dice, new DiceFragment());
             put(R.id.spinner, new SpinnerFragment());
-            put(R.id.guides, new GuideFragment());
+//            put(R.id.guides, new GuideFragment());
+            put(R.id.pts, new PointsFragment());
             put(R.id.more_options, new AdditionalFragment());
         }};
 
         // Guide followed for navigation bar and fragments: https://youtu.be/AL_1UDa9l3U
         getSupportFragmentManager().beginTransaction().replace(
-                R.id.frg_container, new CoinFragment()
+                R.id.frg_container, frgs.get(R.id.coin_flip)
         ).commit();
 
         BottomNavigationView btmNav = findViewById(R.id.btm_nav);

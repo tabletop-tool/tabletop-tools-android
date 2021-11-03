@@ -13,9 +13,13 @@
         android:title="@string/spinner"
         android:icon="@drawable/ic_baseline_rotate_right_24"/>
 
-    <item android:id="@+id/guides"
-        android:title="@string/guides"
-        android:icon="@drawable/ic_baseline_library_books_24"/>
+    <item android:id="@+id/pts"
+        android:title="@string/pts"
+        android:icon="@drawable/ic_baseline_money_24"/>
+
+<!--    <item android:id="@+id/guides"-->
+<!--        android:title="@string/guides"-->
+<!--        android:icon="@drawable/ic_baseline_library_books_24"/>-->
 
     <item android:id="@+id/more_options"
         android:title="@string/more_options"
