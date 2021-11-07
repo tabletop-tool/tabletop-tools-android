@@ -5,12 +5,12 @@
     <string name="spinner">Spinner</string>
     <string name="guides">Guides</string>
     <string name="more_options">More Options</string>
-    <string name="click_me">Click Me!</string>
+    <string name="flip_me">Flip Me!</string>
 
     <string name='h'>Head</string>
     <string name="t">Tail</string>
 
-    <string name="ready_to_flip">Ready To Roll</string>
+    <string name="ready_to_roll">Ready To Roll</string>
 
     <string name="pointer_for_user_visual">Pointer for user visual</string>
     <string name="pts">Points</string>

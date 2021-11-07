@@ -102,7 +102,7 @@ public class SpinnerFragment extends Fragment implements View.OnClickListener, A
         RotateAnimation rtAnim = new RotateAnimation(0, cal,
                 RotateAnimation.RELATIVE_TO_SELF, 0.5f,
                 RotateAnimation.RELATIVE_TO_SELF, 0.5f);
-        rtAnim.setDuration(500);
+        rtAnim.setDuration(1000);
         rtAnim.setInterpolator(new DecelerateInterpolator());
         rtAnim.setFillAfter(true);
         rtAnim.setAnimationListener(this);

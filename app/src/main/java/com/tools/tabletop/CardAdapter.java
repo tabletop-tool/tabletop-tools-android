@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,8 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.Viewholder>{
 
     private Context ctx;
     private ArrayList<CardPoints> ptsAL;
+    public Integer ptsAdd = 10;
+    public Integer ptsMin = 10;
 
     public CardAdapter(Context ctx, ArrayList<CardPoints> ini) {
         this.ctx = ctx;
@@ -43,6 +46,18 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.Viewholder>{
         CardPoints tmp = this.ptsAL.get(position);
         holder.pts.setText(String.valueOf(tmp.getScore()));
         holder.ply.setText(tmp.getPlayer());
+        holder.pBtn.setOnClickListener(v -> {
+            CardPoints temp = ptsAL.get(position);
+            int val = temp.getScore() + ptsAdd;
+            holder.pts.setText(String.valueOf(val));
+            temp.setScore(val);
+        });
+        holder.mBtn.setOnClickListener(v -> {
+            CardPoints temp = ptsAL.get(position);
+            int val = temp.getScore() - ptsMin;
+            holder.pts.setText(String.valueOf(val));
+            temp.setScore(val);
+        });
     }
 
     @Override
@@ -52,11 +67,14 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.Viewholder>{
 
     public static class Viewholder extends RecyclerView.ViewHolder {
         private TextView pts, ply;
+        private ImageButton pBtn, mBtn;
 
         public Viewholder(@NonNull View itemView) {
             super(itemView);
             this.pts = itemView.findViewById(R.id.card_pts_info);
             this.ply = itemView.findViewById(R.id.card_pts_player);
+            this.pBtn = itemView.findViewById(R.id.plus_btn);
+            this.mBtn = itemView.findViewById(R.id.minus_btn);
         }
     }
 }
@@ -78,13 +96,8 @@ class CardPoints {
         return this.score;
     }
 
-    public boolean addScore(int i) {
-        this.score += i;
-        return true;
-    }
-
-    public boolean minusScore(int i) {
-        this.score -= i;
+    public boolean setScore(int i) {
+        this.score = i;
         return true;
     }
 }
