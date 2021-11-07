@@ -40,7 +40,8 @@ public class SpinnerFragment extends Fragment implements View.OnClickListener, A
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_spinner, container, false);
 
         pC = v.findViewById(R.id.circular);

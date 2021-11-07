@@ -20,7 +20,10 @@ public class CoinFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_coin, container, false);
 
         this.flipBtn = v.findViewById(R.id.coin_btn);

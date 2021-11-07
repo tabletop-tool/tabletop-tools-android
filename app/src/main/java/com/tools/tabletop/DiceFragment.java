@@ -23,7 +23,10 @@ public class DiceFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_dice, container, false);
 
         this.dice = v.findViewById(R.id.dice);
