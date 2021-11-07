@@ -27,12 +27,14 @@ public class PointsFragment extends Fragment {
 
         // Some code from: https://youtu.be/xYmH61Ilglc
         this.rv = v.findViewById(R.id.pts_list);
+
         if (this.data == null) {
             this.data = new ArrayList<>();
 
             this.data.add(new CardPoints("Player 1", 10));
             this.data.add(new CardPoints("Player 2", 0));
         }
+
         this.rv.setAdapter(new CardAdapter(this.getContext(), data));
 
         return v;

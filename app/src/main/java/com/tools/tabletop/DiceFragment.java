@@ -25,6 +25,7 @@ public class DiceFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_dice, container, false);
+
         this.dice = v.findViewById(R.id.dice);
 
         this.dice.setOnClickListener(v1 -> {
@@ -33,13 +34,9 @@ public class DiceFragment extends Fragment {
             this.changeDice();
         });
 
-        return v;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
         if (this.result != null) this.changeDice(false);
+
+        return v;
     }
 
     private void changeDice(boolean change) {

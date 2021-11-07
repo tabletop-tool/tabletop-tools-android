@@ -34,7 +34,7 @@ public class SpinnerFragment extends Fragment implements View.OnClickListener, A
     private ArrayList<PieEntry> pe;
     private ArrayList<Integer> colors;
     private static final Random rdm = new Random();
-    private float dgr = 0f;
+    private float dgr = -98764f;
     private boolean spinning = false;
 
     @Nullable
@@ -54,6 +54,11 @@ public class SpinnerFragment extends Fragment implements View.OnClickListener, A
 
         this.pieChartSetup();
         this.loadPieChart();
+
+        if (this.dgr == -98764f) this.dgr = 0f;
+        else {
+            this.p.setRotation(this.dgr);
+        }
 
         return v;
     }
@@ -94,6 +99,8 @@ public class SpinnerFragment extends Fragment implements View.OnClickListener, A
         // code reference: https://youtu.be/5O2Uox-TR00
         if(this.spinning) return;
         this.spinning = true;
+
+        this.p.setRotation(0f);
 
         float gen = rdm.nextFloat() * 360;
         int spins = rdm.nextInt(9) + 1;

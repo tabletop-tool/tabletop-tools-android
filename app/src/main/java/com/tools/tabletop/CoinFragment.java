@@ -34,13 +34,9 @@ public class CoinFragment extends Fragment {
             }
         });
 
-        return v;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
         if (this.result != -1) this.changeBtn();
+
+        return v;
     }
 
     private void changeBtn() {
