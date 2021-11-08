@@ -1,5 +1,6 @@
 package com.tools.tabletop;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -7,6 +8,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+
 import androidx.appcompat.widget.SearchView;
 
 import androidx.annotation.NonNull;
@@ -26,6 +29,7 @@ public class PointsFragment extends Fragment {
 
     private CardPoints deleted;
 
+    private View v;
     private RecyclerView rv;
     private ArrayList<CardPoints> data;
     private ArrayList<CardPoints> display;
@@ -60,7 +64,8 @@ public class PointsFragment extends Fragment {
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
             // code reference: https://youtu.be/Aup-aPj24eU
             int pos = viewHolder.getAdapterPosition();
-            if ( direction == ItemTouchHelper.LEFT) {
+
+            if (direction == ItemTouchHelper.LEFT) {
                 deleted = data.get(pos);
                 display.remove(pos);
                 data.remove(pos);
@@ -73,6 +78,30 @@ public class PointsFragment extends Fragment {
                             data.add(pos, deleted);
                             rv.getAdapter().notifyItemInserted(pos);
                         }).show();
+            } else { // right
+                // code reference: https://youtu.be/eslYJArppnQ
+
+                CardPoints target = display.get(pos);
+                EditText et = new EditText(v.getContext());
+                et.setText(target.getPlayer());
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                builder.setTitle("Change Name");
+                builder.setCancelable(true);
+                builder.setView(et);
+
+                builder.setNeutralButton("Cancel", (d, v) -> {
+                    display.add(pos, target);
+                    rv.getAdapter().notifyItemInserted(pos);
+                });
+
+                builder.setPositiveButton("Update", (d, v) -> {
+                   target.setPlayer(et.getText().toString());
+                   data.get(pos).setPlayer(et.getText().toString());
+                   rv.getAdapter().notifyItemChanged(pos);
+                });
+
+                builder.show();
             }
         }
     });
@@ -83,10 +112,10 @@ public class PointsFragment extends Fragment {
             @NonNull LayoutInflater inflater,
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_points, container, false);
+        this.v = inflater.inflate(R.layout.fragment_points, container, false);
 
         // Code Reference: https://youtu.be/xYmH61Ilglc
-        this.rv = v.findViewById(R.id.pts_list);
+        this.rv = this.v.findViewById(R.id.pts_list);
 
         if (this.data == null) {
             this.data = new ArrayList<>();
@@ -105,7 +134,7 @@ public class PointsFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        return v;
+        return this.v;
     }
 
     @Override
@@ -144,5 +173,34 @@ public class PointsFragment extends Fragment {
         });
 
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.add_plyer:
+                EditText et = new EditText(v.getContext());
+                et.setText("New Challenger");
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                builder.setTitle("New Points Tracker");
+                builder.setCancelable(true);
+                builder.setView(et);
+
+                builder.setNeutralButton("Cancel", null);
+
+                builder.setPositiveButton("Create", (d, v) -> {
+                    CardPoints created = new CardPoints(et.getText().toString(),0);
+                    data.add(created);
+                    display.add(created);
+                    rv.getAdapter().notifyItemChanged(display.size() - 1);
+                });
+
+                builder.show();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

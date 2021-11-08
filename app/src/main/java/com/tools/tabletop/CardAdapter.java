@@ -100,4 +100,8 @@ class CardPoints {
         this.score = i;
         return true;
     }
+
+    public void setPlayer(String player) {
+        this.player = player;
+    }
 }
