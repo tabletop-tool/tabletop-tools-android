@@ -1,7 +1,6 @@
 package com.tools.tabletop;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,16 +12,70 @@ import androidx.appcompat.widget.SearchView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Random;
 
 public class PointsFragment extends Fragment {
+
+    private CardPoints deleted;
 
     private RecyclerView rv;
     private ArrayList<CardPoints> data;
     private ArrayList<CardPoints> display;
+
+    private ItemTouchHelper itTh = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+        @Override
+        public int getMovementFlags(
+                @NonNull RecyclerView recyclerView,
+                @NonNull RecyclerView.ViewHolder viewHolder) {
+            return makeMovementFlags(
+                    ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+                    ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT
+            );
+        }
+
+        @Override
+        public boolean onMove(
+                @NonNull RecyclerView recyclerView,
+                @NonNull RecyclerView.ViewHolder viewHolder,
+                @NonNull RecyclerView.ViewHolder target) {
+            int start = viewHolder.getAdapterPosition();
+            int end = target.getAdapterPosition();
+
+            Collections.swap(display, start, end);
+            Collections.swap(data, start, end);
+
+            rv.getAdapter().notifyItemMoved(start, end);
+            return true;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            // code reference: https://youtu.be/Aup-aPj24eU
+            int pos = viewHolder.getAdapterPosition();
+            if ( direction == ItemTouchHelper.LEFT) {
+                deleted = data.get(pos);
+                display.remove(pos);
+                data.remove(pos);
+                rv.getAdapter().notifyItemRemoved(pos);
+
+                Snackbar.make(
+                        rv, String.format("Deleted: %s", deleted.getPlayer()),
+                        Snackbar.LENGTH_LONG).setAction("Undo", view -> {
+                            display.add(pos, deleted);
+                            data.add(pos, deleted);
+                            rv.getAdapter().notifyItemInserted(pos);
+                        }).show();
+            }
+        }
+    });
 
     @Nullable
     @Override
@@ -32,20 +85,24 @@ public class PointsFragment extends Fragment {
             @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_points, container, false);
 
-        // Some code from: https://youtu.be/xYmH61Ilglc
+        // Code Reference: https://youtu.be/xYmH61Ilglc
         this.rv = v.findViewById(R.id.pts_list);
 
         if (this.data == null) {
             this.data = new ArrayList<>();
+            Random r = new Random();
 
-            this.data.add(new CardPoints("Player 1", 10));
-            this.data.add(new CardPoints("Player 2", 0));
+            for (int i = 0; i < 15; i++)
+                this.data.add(new CardPoints("Player " + (i + 1), 1 + r.nextInt(99)));
+
             this.data.add(new CardPoints("Unique", 1000));
 
             this.display = new ArrayList<>(this.data);
         }
 
         this.rv.setAdapter(new CardAdapter(this.getContext(), this.display));
+        this.itTh.attachToRecyclerView(this.rv);
+
         setHasOptionsMenu(true);
 
         return v;
@@ -54,6 +111,8 @@ public class PointsFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.points_menu, menu);
+
+        // code reference: https://youtu.be/V1aLOkwV84o
 
         MenuItem search = menu.findItem(R.id.search);
         SearchView sv = (SearchView) search.getActionView();
