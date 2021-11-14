@@ -2,6 +2,8 @@ package com.tools.tabletop;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -39,7 +41,14 @@ public class DiceFragment extends Fragment {
 
         if (this.result != null) this.changeDice(false);
 
+        setHasOptionsMenu(true);
         return v;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.basic_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     private void changeDice(boolean change) {

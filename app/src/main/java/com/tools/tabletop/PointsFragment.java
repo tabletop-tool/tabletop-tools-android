@@ -1,6 +1,7 @@
 package com.tools.tabletop;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -9,6 +10,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.widget.SearchView;
 
@@ -27,12 +30,12 @@ import java.util.Random;
 
 public class PointsFragment extends Fragment {
 
-    private CardPoints deleted;
+    private PointsData deleted;
 
     private View v;
     private RecyclerView rv;
-    private ArrayList<CardPoints> data;
-    private ArrayList<CardPoints> display;
+    private ArrayList<PointsData> data;
+    private ArrayList<PointsData> display;
 
     private ItemTouchHelper itTh = new ItemTouchHelper(new ItemTouchHelper.Callback() {
         @Override
@@ -50,6 +53,7 @@ public class PointsFragment extends Fragment {
                 @NonNull RecyclerView recyclerView,
                 @NonNull RecyclerView.ViewHolder viewHolder,
                 @NonNull RecyclerView.ViewHolder target) {
+
             int start = viewHolder.getAdapterPosition();
             int end = target.getAdapterPosition();
 
@@ -81,7 +85,7 @@ public class PointsFragment extends Fragment {
             } else { // right
                 // code reference: https://youtu.be/eslYJArppnQ
 
-                CardPoints target = display.get(pos);
+                PointsData target = display.get(pos);
                 EditText et = new EditText(v.getContext());
                 et.setText(target.getPlayer());
 
@@ -122,14 +126,14 @@ public class PointsFragment extends Fragment {
             Random r = new Random();
 
             for (int i = 0; i < 15; i++)
-                this.data.add(new CardPoints("Player " + (i + 1), 1 + r.nextInt(99)));
+                this.data.add(new PointsData("Player " + (i + 1), 1 + r.nextInt(99)));
 
-            this.data.add(new CardPoints("Unique", 1000));
+            this.data.add(new PointsData("Unique", 1000));
 
             this.display = new ArrayList<>(this.data);
         }
 
-        this.rv.setAdapter(new CardAdapter(this.getContext(), this.display));
+        this.rv.setAdapter(new PointsAdapter(this.getContext(), this.display));
         this.itTh.attachToRecyclerView(this.rv);
 
         setHasOptionsMenu(true);
@@ -159,11 +163,13 @@ public class PointsFragment extends Fragment {
                 } else {
                     display.clear();
                     newText = newText.toLowerCase(Locale.getDefault());
-                    for (CardPoints i: data) {
+
+                    for (PointsData i: data) {
                         if(i.getPlayer().toLowerCase(Locale.getDefault()).contains(newText)) {
                             display.add(i);
                         }
                     }
+
                 }
 
                 rv.getAdapter().notifyDataSetChanged();
@@ -190,7 +196,7 @@ public class PointsFragment extends Fragment {
                 builder.setNeutralButton("Cancel", null);
 
                 builder.setPositiveButton("Create", (d, v) -> {
-                    CardPoints created = new CardPoints(et.getText().toString(),0);
+                    PointsData created = new PointsData(et.getText().toString(),0);
                     data.add(created);
                     display.add(created);
                     rv.getAdapter().notifyItemChanged(display.size() - 1);
@@ -204,3 +210,93 @@ public class PointsFragment extends Fragment {
         }
     }
 }
+
+class PointsAdapter extends RecyclerView.Adapter<PointsAdapter.Viewholder>{
+
+    private Context ctx;
+    private ArrayList<PointsData> ptsAL;
+    public Integer ptsAdd = 10;
+    public Integer ptsMin = 10;
+
+    public PointsAdapter(Context ctx, ArrayList<PointsData> ini) {
+        this.ctx = ctx;
+        this.ptsAL = ini;
+    }
+
+    @NonNull
+    @Override
+    public PointsAdapter.Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(
+                parent.getContext()
+        ).inflate(R.layout.card_pts, parent, false);
+        return new Viewholder(view) {
+        };
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull PointsAdapter.Viewholder holder, int position) {
+        PointsData tmp = this.ptsAL.get(position);
+        holder.pts.setText(String.valueOf(tmp.getScore()));
+        holder.ply.setText(tmp.getPlayer());
+
+        holder.pBtn.setOnClickListener(v -> {
+            PointsData temp = ptsAL.get(position);
+            int val = temp.getScore() + ptsAdd;
+            holder.pts.setText(String.valueOf(val));
+            temp.setScore(val);
+        });
+
+        holder.mBtn.setOnClickListener(v -> {
+            PointsData temp = ptsAL.get(position);
+            int val = temp.getScore() - ptsMin;
+            holder.pts.setText(String.valueOf(val));
+            temp.setScore(val);
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return this.ptsAL.size();
+    }
+
+    public static class Viewholder extends RecyclerView.ViewHolder {
+        private TextView pts, ply;
+        private ImageButton pBtn, mBtn;
+
+        public Viewholder(@NonNull View itemView) {
+            super(itemView);
+            this.pts = itemView.findViewById(R.id.card_pts_info);
+            this.ply = itemView.findViewById(R.id.card_pts_player);
+            this.pBtn = itemView.findViewById(R.id.plus_btn);
+            this.mBtn = itemView.findViewById(R.id.minus_btn);
+        }
+    }
+}
+
+class PointsData {
+    private String player;
+    private int score;
+
+    public PointsData(String s, int p) {
+        this.player = s;
+        this.score = p;
+    }
+
+    public String getPlayer() {
+        return this.player;
+    }
+
+    public int getScore() {
+        return this.score;
+    }
+
+    public boolean setScore(int i) {
+        this.score = i;
+        return true;
+    }
+
+    public void setPlayer(String player) {
+        this.player = player;
+    }
+}
+

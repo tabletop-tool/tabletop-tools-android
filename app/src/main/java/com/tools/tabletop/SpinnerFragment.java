@@ -3,6 +3,8 @@ package com.tools.tabletop;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -61,7 +63,14 @@ public class SpinnerFragment extends Fragment implements View.OnClickListener, A
             this.p.setRotation(this.dgr);
         }
 
+        setHasOptionsMenu(true);
         return v;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.basic_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     private void pieChartSetup() {
