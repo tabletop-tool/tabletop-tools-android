@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -22,6 +23,9 @@ public class DiceFragment extends Fragment {
     private int[] range = {1, 6};
     private ArrayList<Integer> custom = new ArrayList<>();
 
+    private HistoryFragment diceHisFrg;
+    private ArrayList<int[]>  diceHis;
+
 
     @Nullable
     @Override
@@ -31,12 +35,19 @@ public class DiceFragment extends Fragment {
             @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_dice, container, false);
 
+        if (this.diceHis == null) {
+            this.diceHis = new ArrayList<>();
+            this.diceHisFrg = new HistoryFragment(this.diceHis, 1);
+        }
+
         this.dice = v.findViewById(R.id.dice);
 
         this.dice.setOnClickListener(v1 -> {
             if (v1.getId() != R.id.dice) return;
 
             this.changeDice();
+            int[] insert = {this.result, this.range[0], this.range[1]};
+            this.diceHis.add(0, insert);
         });
 
         if (this.result != null) this.changeDice(false);
@@ -48,6 +59,15 @@ public class DiceFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.basic_menu, menu);
+
+        MenuItem history = menu.findItem(R.id.history_btn);
+        history.setOnMenuItemClickListener(i -> {
+            requireActivity().getSupportFragmentManager().beginTransaction().replace(
+                    R.id.frg_container, this.diceHisFrg
+            ).addToBackStack(null).commit();
+            return true;
+        });
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 

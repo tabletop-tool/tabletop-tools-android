@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -28,14 +29,14 @@ public class HistoryFragment<T> extends Fragment {
     private ArrayList<T> history;
     private T deleted;
 
-    public HistoryFragment(ArrayList<T> history) {
+    public HistoryFragment(ArrayList<T> history, int type) {
         super();
         this.history = history;
 
-        this.mode = 0;
+        this.mode = type;
     }
 
-    private ItemTouchHelper itTh = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+    private final ItemTouchHelper itTh = new ItemTouchHelper(new ItemTouchHelper.Callback() {
         @Override
         public int getMovementFlags(
                 @NonNull RecyclerView recyclerView,
@@ -93,7 +94,17 @@ public class HistoryFragment<T> extends Fragment {
             tv.setText("");
         }
 
-        this.rv.setAdapter(new CoinAdapter(this.getContext(), (ArrayList<Boolean>) this.history));
+        if (mode == 0) this.rv.setAdapter(
+                new CoinAdapter(this.getContext(), (ArrayList<Boolean>) this.history)
+        );
+        else if (mode == 1) this.rv.setAdapter(
+                new DiceAdapter(this.getContext(), (ArrayList<int[]>) this.history)
+        );
+        else if (mode == 2) this.rv.setAdapter(
+                new SpinAdapter(this.getContext(), (ArrayList<String[]>) this.history)
+        );
+        // should never reach the line below
+        else tv.setText(getString(R.string.err));
 
         this.itTh.attachToRecyclerView(this.rv);
 
@@ -103,8 +114,8 @@ public class HistoryFragment<T> extends Fragment {
 
 class CoinAdapter extends RecyclerView.Adapter<CoinAdapter.Viewholder> {
 
-    private ArrayList<Boolean> coinHis;
-    private Context ctx;
+    private final ArrayList<Boolean> coinHis;
+    private final Context ctx;
 
     public CoinAdapter(Context ctx, ArrayList<Boolean> ini) {
         this.coinHis = ini;
@@ -126,10 +137,10 @@ class CoinAdapter extends RecyclerView.Adapter<CoinAdapter.Viewholder> {
         Boolean data = this.coinHis.get(position);
 
         if (data) {
-            holder.bk.setBackgroundColor(Color.parseColor("#0984e3"));
+            holder.bk.setCardBackgroundColor(Color.parseColor("#0984e3"));
             holder.result.setText(ctx.getString(R.string.h));
         } else {
-            holder.bk.setBackgroundColor(Color.parseColor("#00cec9"));
+            holder.bk.setCardBackgroundColor(Color.parseColor("#00cec9"));
             holder.result.setText(ctx.getString(R.string.t));
         }
     }
@@ -138,13 +149,103 @@ class CoinAdapter extends RecyclerView.Adapter<CoinAdapter.Viewholder> {
     public int getItemCount() { return this.coinHis.size(); }
 
     protected static class Viewholder extends RecyclerView.ViewHolder {
-        private TextView result;
-        private CardView bk;
+        private final TextView result;
+        private final CardView bk;
 
         public Viewholder(@NonNull View itemView) {
             super(itemView);
             this.result = itemView.findViewById(R.id.coin_result);
             this.bk = itemView.findViewById(R.id.coin_card_view);
+        }
+    }
+}
+
+class DiceAdapter extends RecyclerView.Adapter<DiceAdapter.Viewholder> {
+
+    private final ArrayList<int[]> diceHis;
+    private final Context ctx;
+
+    public DiceAdapter(Context ctx, ArrayList<int[]> ini) {
+        this.diceHis = ini;
+        this.ctx = ctx;
+    }
+
+    @NonNull
+    @Override
+    public DiceAdapter.Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(
+                parent.getContext()
+        ).inflate(R.layout.card_dice, parent, false);
+
+        return new Viewholder(view){};
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull DiceAdapter.Viewholder holder, int position) {
+        int[] data = this.diceHis.get(position);
+
+        holder.result.setText(String.valueOf(data[0]));
+        holder.range.setText(data[1] + " - " + data[2]);
+    }
+
+    @Override
+    public int getItemCount() { return this.diceHis.size(); }
+
+    protected static class Viewholder extends RecyclerView.ViewHolder {
+        private final TextView result, range;
+
+        public Viewholder(@NonNull View itemView) {
+            super(itemView);
+            this.result = itemView.findViewById(R.id.dice_result);
+            this.range = itemView.findViewById(R.id.dice_range);
+        }
+    }
+}
+
+class SpinAdapter extends RecyclerView.Adapter<SpinAdapter.Viewholder> {
+
+    private final ArrayList<String[]> spinHis;
+    private final Context ctx;
+
+    public SpinAdapter(Context ctx, ArrayList<String[]> ini) {
+        this.spinHis = ini;
+        this.ctx = ctx;
+    }
+
+    @NonNull
+    @Override
+    public SpinAdapter.Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(
+                parent.getContext()
+        ).inflate(R.layout.card_spin, parent, false);
+
+        return new Viewholder(view){};
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull SpinAdapter.Viewholder holder, int position) {
+        String[] data = this.spinHis.get(position);
+
+        holder.result.setText(data[0] + "°");
+        holder.label.setText(data[2]);
+        holder.bk.setCardBackgroundColor(Integer.parseInt(data[1]));
+        holder.point.setRotation(Float.parseFloat(data[0]));
+    }
+
+    @Override
+    public int getItemCount() { return this.spinHis.size(); }
+
+    protected static class Viewholder extends RecyclerView.ViewHolder {
+        private final TextView result, label;
+        private final CardView bk;
+        private final ImageView point;
+
+        public Viewholder(@NonNull View itemView) {
+            super(itemView);
+            this.result = itemView.findViewById(R.id.spin_result);
+            this.label = itemView.findViewById(R.id.spin_label);
+            this.bk = itemView.findViewById(R.id.spin_card_view);
+            this.point = itemView.findViewById(R.id.spin_point);
         }
     }
 }

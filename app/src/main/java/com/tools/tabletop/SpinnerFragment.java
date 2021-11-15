@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -27,7 +28,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
-public class SpinnerFragment extends Fragment implements View.OnClickListener, Animation.AnimationListener {
+public class SpinnerFragment extends Fragment implements
+        View.OnClickListener, Animation.AnimationListener {
     private View v;
 
     private PieChart pC;
@@ -39,6 +41,9 @@ public class SpinnerFragment extends Fragment implements View.OnClickListener, A
     private float dgr = -98764f;
     private boolean spinning = false;
 
+    private ArrayList<String[]> spinHis;
+    private HistoryFragment spinHisFrg;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -46,14 +51,21 @@ public class SpinnerFragment extends Fragment implements View.OnClickListener, A
                              @Nullable Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_spinner, container, false);
 
+        if(spinHis == null) {
+            this.spinHis = new ArrayList<>();
+            this.spinHisFrg = new HistoryFragment(this.spinHis, 2);
+        }
+
         pC = v.findViewById(R.id.circular);
         p = v.findViewById(R.id.pointer);
 
         Button b = v.findViewById(R.id.cir_btn);
         b.setOnClickListener(this);
 
-        pe = new ArrayList<>();
-        colors = new ArrayList<>();
+        if (pe == null) {
+            pe = new ArrayList<>();
+            colors = new ArrayList<>();
+        }
 
         this.pieChartSetup();
         this.loadPieChart();
@@ -70,6 +82,16 @@ public class SpinnerFragment extends Fragment implements View.OnClickListener, A
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.basic_menu, menu);
+
+        MenuItem history = menu.findItem(R.id.history_btn);
+        history.setOnMenuItemClickListener(i -> {
+            requireActivity().getSupportFragmentManager().beginTransaction().replace(
+                    R.id.frg_container, this.spinHisFrg
+            ).addToBackStack(null).commit();
+            return true;
+        });
+
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -105,7 +127,8 @@ public class SpinnerFragment extends Fragment implements View.OnClickListener, A
         pC.invalidate();
     }
 
-    private void spin() {
+    @Override
+    public void onClick(View v) {
         // code reference: https://youtu.be/5O2Uox-TR00
         if(this.spinning) return;
         this.spinning = true;
@@ -129,33 +152,33 @@ public class SpinnerFragment extends Fragment implements View.OnClickListener, A
     }
 
     @Override
-    public void onClick(View v) {
-        this.spin();
-    }
-
-    @Override
     public void onAnimationStart(Animation animation) {
 
     }
 
     @Override
     public void onAnimationEnd(Animation animation) {
-        String result = "...";
+        int result = -1;
         float temp = 0f;
 
-        for (PieEntry i: pe) {
+        for (int i = 0; i < pe.size(); i++) {
             float prev = temp;
-            temp += 360 / (100 / i.getValue());
+            temp += 360 / (100 / pe.get(i).getValue());
             if (prev <= this.dgr && this.dgr < temp) {
-                result = i.getLabel();
+                result = i;
                 break;
             }
         }
 
+        String txt = "...";
+        if (result > -1) txt = pe.get(result).getLabel();
+
         Toast.makeText(v.getContext(),
-                "You got " + result + " (" + this.dgr + ")",
-                Toast.LENGTH_SHORT).show();
+                "You got " + txt + " (" + this.dgr + ")", Toast.LENGTH_SHORT).show();
         this.spinning = false;
+
+        String[] insert = {String.valueOf(this.dgr), String.valueOf(this.colors.get(result)), txt};
+        this.spinHis.add(0, insert);
     }
 
     @Override

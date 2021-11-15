@@ -24,7 +24,7 @@ public class CoinFragment extends Fragment {
 
     private HistoryFragment coinHstFrg;
 
-    private ArrayList<Boolean> coin_history;
+    private ArrayList<Boolean> coinHis;
 
     @Nullable
     @Override
@@ -33,9 +33,9 @@ public class CoinFragment extends Fragment {
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
 
-        if (coin_history == null) {
-            coin_history = new ArrayList<>();
-            coinHstFrg = new HistoryFragment(this.coin_history);
+        if (coinHis == null) {
+            coinHis = new ArrayList<>();
+            coinHstFrg = new HistoryFragment(this.coinHis, 0);
         }
 
         View v = inflater.inflate(R.layout.fragment_coin, container, false);
@@ -50,8 +50,8 @@ public class CoinFragment extends Fragment {
                 this.changeBtn();
             }
 
-            if (result == 1) this.coin_history.add(0, true);
-            else this.coin_history.add(0, false);
+            if (result == 1) this.coinHis.add(0, true);
+            else this.coinHis.add(0, false);
         });
 
         if (this.result != -1) this.changeBtn();

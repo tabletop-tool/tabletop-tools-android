@@ -1,11 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/coin_card_view"
+    android:id="@+id/dice_card_view"
     app:cardBackgroundColor="@color/design_default_color_primary"
     app:cardCornerRadius="20dp"
     app:contentPadding="5dp"
@@ -19,7 +18,7 @@
         android:padding="10dp">
 
         <TextView
-            android:id="@+id/coin_result"
+            android:id="@+id/dice_result"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Result Here"
@@ -27,9 +26,18 @@
             android:textSize="30sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/dice_range"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="i - k"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>
