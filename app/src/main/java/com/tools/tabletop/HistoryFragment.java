@@ -1,11 +1,16 @@
 package com.tools.tabletop;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -107,8 +112,32 @@ public class HistoryFragment<T> extends Fragment {
         else tv.setText(getString(R.string.err));
 
         this.itTh.attachToRecyclerView(this.rv);
+        setHasOptionsMenu(true);
 
         return this.v;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.history_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+        builder.setTitle("You sure you want to clear all history record(s)?");
+        builder.setCancelable(true);
+
+        builder.setNeutralButton("No", null);
+
+        builder.setPositiveButton("Yes", (d, v) -> {
+            history.clear();
+            rv.getAdapter().notifyDataSetChanged();
+            tv.setText(getString(R.string.aww_there_is_nothing_here));
+        });
+
+        builder.show();
+        return true;
     }
 }
 
