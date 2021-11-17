@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="Dice Range">
+
+        <EditTextPreference
+            android:key="dice_min"
+            android:title="Dice Minimum Range"
+            app:useSimpleSummaryProvider="true"
+            android:defaultValue="1"/>
+        <EditTextPreference
+            android:key="dice_max"
+            android:title="Dice Maximum Range"
+            app:useSimpleSummaryProvider="true"
+            android:defaultValue="6" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

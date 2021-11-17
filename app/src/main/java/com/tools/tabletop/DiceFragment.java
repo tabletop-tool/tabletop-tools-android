@@ -1,5 +1,6 @@
 package com.tools.tabletop;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -26,6 +28,7 @@ public class DiceFragment extends Fragment {
     private HistoryFragment<int[]> diceHisFrg;
     private ArrayList<int[]>  diceHis;
 
+    private DiceSetting setting;
 
     @Nullable
     @Override
@@ -40,6 +43,8 @@ public class DiceFragment extends Fragment {
             this.diceHisFrg = new HistoryFragment<>(this.diceHis, 1);
         }
 
+        if (this.setting == null) this.setting = new DiceSetting();
+
         this.dice = v.findViewById(R.id.dice);
 
         this.dice.setOnClickListener(v1 -> {
@@ -53,7 +58,15 @@ public class DiceFragment extends Fragment {
         if (this.result != null) this.changeDice(false);
 
         setHasOptionsMenu(true);
+        this.loadSettings();
         return v;
+    }
+
+    public void loadSettings() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        int mini = Integer.parseInt(sp.getString("dice_min", "1"));
+        int maxi = Integer.parseInt(sp.getString("dice_max", "6"));
+        this.range = new int[]{mini, maxi};
     }
 
     @Override
@@ -66,6 +79,14 @@ public class DiceFragment extends Fragment {
                     R.id.frg_container, this.diceHisFrg
             ).addToBackStack(null).commit();
             return true;
+        });
+
+        MenuItem s = menu.findItem(R.id.settings_btn);
+        s.setOnMenuItemClickListener(i -> {
+            requireActivity().getSupportFragmentManager().beginTransaction().replace(
+                    R.id.frg_container, this.setting
+            ).addToBackStack(null).commit();
+           return true;
         });
 
         super.onCreateOptionsMenu(menu, inflater);
