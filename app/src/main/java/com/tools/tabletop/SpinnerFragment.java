@@ -25,6 +25,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 
@@ -35,14 +36,16 @@ public class SpinnerFragment extends Fragment implements
     private PieChart pC;
     private ImageView p;
 
-    private ArrayList<PieEntry> pe;
-    private ArrayList<Integer> colors;
+    private PieEntry[] pe;
+    private int[] colors;
     private static final Random rdm = new Random();
     private float dgr = -98764f;
     private boolean spinning = false;
 
     private ArrayList<String[]> spinHis;
-    private HistoryFragment spinHisFrg;
+    private HistoryFragment<String[]> spinHisFrg;
+
+    private ArrayList<String[]> custom;
 
     @Nullable
     @Override
@@ -51,9 +54,17 @@ public class SpinnerFragment extends Fragment implements
                              @Nullable Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_spinner, container, false);
 
-        if(spinHis == null) {
+        if (spinHis == null) {
             this.spinHis = new ArrayList<>();
-            this.spinHisFrg = new HistoryFragment(this.spinHis, 2);
+            this.spinHisFrg = new HistoryFragment<>(this.spinHis, 2);
+        }
+
+        if (custom == null) {
+            custom = new ArrayList<>();
+
+            // TODO: temporary
+            custom.add(new String[]{"Red", "#d63031", "30f"});
+            custom.add(new String[]{"Blue", "#0984e3", "35f"});
         }
 
         pC = v.findViewById(R.id.circular);
@@ -62,10 +73,8 @@ public class SpinnerFragment extends Fragment implements
         Button b = v.findViewById(R.id.cir_btn);
         b.setOnClickListener(this);
 
-        if (pe == null) {
-            pe = new ArrayList<>();
-            colors = new ArrayList<>();
-        }
+        pe = new PieEntry[this.custom.size() + 1];
+        colors = new int[this.custom.size() + 1];
 
         this.pieChartSetup();
         this.loadPieChart();
@@ -105,19 +114,20 @@ public class SpinnerFragment extends Fragment implements
 
     private void loadPieChart() {
         // code reference: https://youtu.be/S3zqxVoIUig
-        pe.add(new PieEntry(25f, "Red"));
-        pe.add(new PieEntry(25f, "Blue"));
-        colors.add(Color.parseColor("#d63031"));
-        colors.add(Color.parseColor("#0984e3"));
+        for (int i = 0; i < this.custom.size(); i++) {
+            String[] data = this.custom.get(i);
+            pe[i] = new PieEntry(Float.parseFloat(data[2]), data[0]);
+            colors[i] = Color.parseColor(data[1]);
+        }
 
         // the default
         float remain = 100f;
-        for (PieEntry i: pe)
-            remain -= i.getValue();
-        pe.add(new PieEntry(remain, "Default"));
-        colors.add(Color.parseColor("#b2bec3"));
+        for (int i = 0; i < this.custom.size(); i++)
+            remain -= pe[i].getValue();
+        pe[this.custom.size()] = new PieEntry(remain, "Default");
+        colors[this.custom.size()] = Color.parseColor("#b2bec3");
 
-        PieDataSet pds = new PieDataSet(pe, "Custom");
+        PieDataSet pds = new PieDataSet(Arrays.asList(pe), "Custom");
         pds.setColors(colors);
 
         PieData pd = new PieData(pds);
@@ -161,9 +171,9 @@ public class SpinnerFragment extends Fragment implements
         int result = -1;
         float temp = 0f;
 
-        for (int i = 0; i < pe.size(); i++) {
+        for (int i = 0; i < pe.length; i++) {
             float prev = temp;
-            temp += 360 / (100 / pe.get(i).getValue());
+            temp += 360 / (100 / pe[i].getValue());
             if (prev <= this.dgr && this.dgr < temp) {
                 result = i;
                 break;
@@ -171,13 +181,13 @@ public class SpinnerFragment extends Fragment implements
         }
 
         String txt = "...";
-        if (result > -1) txt = pe.get(result).getLabel();
+        if (result > -1) txt = pe[result].getLabel();
 
         Toast.makeText(v.getContext(),
                 "You got " + txt + " (" + this.dgr + ")", Toast.LENGTH_SHORT).show();
         this.spinning = false;
 
-        String[] insert = {String.valueOf(this.dgr), String.valueOf(this.colors.get(result)), txt};
+        String[] insert = {String.valueOf(this.dgr), String.valueOf(this.colors[result]), txt};
         this.spinHis.add(0, insert);
     }
 

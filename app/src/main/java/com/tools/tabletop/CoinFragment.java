@@ -1,5 +1,6 @@
 package com.tools.tabletop;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -22,7 +24,10 @@ public class CoinFragment extends Fragment {
     private static final Random rand = new Random();
     private Button flipBtn;
 
-    private HistoryFragment coinHstFrg;
+    private HistoryFragment<Boolean> coinHstFrg;
+    private CoinSetting cs;
+
+    private int range = 50;
 
     private ArrayList<Boolean> coinHis;
 
@@ -35,7 +40,11 @@ public class CoinFragment extends Fragment {
 
         if (coinHis == null) {
             coinHis = new ArrayList<>();
-            coinHstFrg = new HistoryFragment(this.coinHis, 0);
+            coinHstFrg = new HistoryFragment<>(this.coinHis, 0);
+        }
+
+        if (cs == null) {
+            cs = new CoinSetting();
         }
 
         View v = inflater.inflate(R.layout.fragment_coin, container, false);
@@ -44,9 +53,14 @@ public class CoinFragment extends Fragment {
         this.flipBtn.setOnClickListener(v1 -> {
             if (v1.getId() != R.id.coin_btn) return;
 
-            int temp = rand.nextInt(2);
-            if (this.result != temp) {
-                this.result = temp;
+            int temp = rand.nextInt(100);
+            int now = -1;
+
+            if (temp <= this.range - 1) now = 1;
+            else now = 0;
+
+            if (this.result != now) {
+                this.result = now;
                 this.changeBtn();
             }
 
@@ -57,7 +71,13 @@ public class CoinFragment extends Fragment {
         if (this.result != -1) this.changeBtn();
 
         setHasOptionsMenu(true);
+        this.loadSetting();
         return v;
+    }
+
+    private void loadSetting() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        this.range = sp.getInt("coin_ratio", 50);
     }
 
     private void changeBtn() {
@@ -78,6 +98,14 @@ public class CoinFragment extends Fragment {
         history.setOnMenuItemClickListener(i -> {
             requireActivity().getSupportFragmentManager().beginTransaction().replace(
                     R.id.frg_container, this.coinHstFrg
+            ).addToBackStack(null).commit();
+            return true;
+        });
+
+        MenuItem settings = menu.findItem(R.id.settings_btn);
+        settings.setOnMenuItemClickListener(i -> {
+            requireActivity().getSupportFragmentManager().beginTransaction().replace(
+                    R.id.frg_container, this.cs
             ).addToBackStack(null).commit();
             return true;
         });

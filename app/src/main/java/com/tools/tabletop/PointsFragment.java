@@ -26,17 +26,16 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
-import java.util.Random;
 
 public class PointsFragment extends Fragment {
 
-    private PointsData deleted;
+    private String[] deleted;
 
     private View v;
     private TextView msg;
     private RecyclerView rv;
-    private ArrayList<PointsData> data;
-    private ArrayList<PointsData> display;
+    private ArrayList<String[]> data;
+    private ArrayList<String[]> display;
 
     private ItemTouchHelper itTh = new ItemTouchHelper(new ItemTouchHelper.Callback() {
         @Override
@@ -77,7 +76,7 @@ public class PointsFragment extends Fragment {
                 rv.getAdapter().notifyItemRemoved(pos);
 
                 Snackbar.make(
-                        rv, String.format("Deleted: %s", deleted.getPlayer()),
+                        rv, String.format("Deleted: %s", deleted[0]),
                         Snackbar.LENGTH_LONG).setAction("Undo", view -> {
                             display.add(pos, deleted);
                             data.add(pos, deleted);
@@ -89,9 +88,9 @@ public class PointsFragment extends Fragment {
             } else { // right
                 // code reference: https://youtu.be/eslYJArppnQ
 
-                PointsData target = display.get(pos);
+                String[] target = display.get(pos);
                 EditText et = new EditText(v.getContext());
-                et.setText(target.getPlayer());
+                et.setText(target[0]);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                 builder.setTitle("Change Name");
@@ -107,8 +106,8 @@ public class PointsFragment extends Fragment {
                 });
 
                 builder.setPositiveButton("Update", (d, v) -> {
-                   target.setPlayer(et.getText().toString());
-                   data.get(pos).setPlayer(et.getText().toString());
+                   target[0] = et.getText().toString();
+                   data.get(pos)[0] = et.getText().toString();
                    rv.getAdapter().notifyItemChanged(pos);
                 });
 
@@ -131,12 +130,6 @@ public class PointsFragment extends Fragment {
 
         if (this.data == null) {
             this.data = new ArrayList<>();
-            Random r = new Random();
-
-            for (int i = 0; i < 3; i++)
-                this.data.add(new PointsData("Player " + (i + 1), 1 + r.nextInt(99)));
-
-            this.data.add(new PointsData("Unique", 1000));
 
             this.display = new ArrayList<>(this.data);
         }
@@ -176,8 +169,8 @@ public class PointsFragment extends Fragment {
                     display.clear();
                     newText = newText.toLowerCase(Locale.getDefault());
 
-                    for (PointsData i: data) {
-                        if(i.getPlayer().toLowerCase(Locale.getDefault()).contains(newText)) {
+                    for (String[] i: data) {
+                        if(i[0].toLowerCase(Locale.getDefault()).contains(newText)) {
                             display.add(i);
                         }
                     }
@@ -198,7 +191,7 @@ public class PointsFragment extends Fragment {
         switch(item.getItemId()) {
             case R.id.add_plyer:
                 EditText et = new EditText(v.getContext());
-                et.setText("New Challenger");
+                et.setText(R.string.new_ch);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                 builder.setTitle("New Points Tracker");
@@ -208,7 +201,7 @@ public class PointsFragment extends Fragment {
                 builder.setNeutralButton("Cancel", null);
 
                 builder.setPositiveButton("Create", (d, v) -> {
-                    PointsData created = new PointsData(et.getText().toString(),0);
+                    String[] created = {et.getText().toString(), "0"};
                     data.add(created);
                     display.add(created);
                     rv.getAdapter().notifyItemChanged(display.size() - 1);
@@ -227,11 +220,11 @@ public class PointsFragment extends Fragment {
 class PointsAdapter extends RecyclerView.Adapter<PointsAdapter.Viewholder>{
 
     private Context ctx;
-    private ArrayList<PointsData> ptsAL;
+    private ArrayList<String[]> ptsAL;
     public Integer ptsAdd = 10;
     public Integer ptsMin = 10;
 
-    public PointsAdapter(Context ctx, ArrayList<PointsData> ini) {
+    public PointsAdapter(Context ctx, ArrayList<String[]> ini) {
         this.ctx = ctx;
         this.ptsAL = ini;
     }
@@ -248,22 +241,22 @@ class PointsAdapter extends RecyclerView.Adapter<PointsAdapter.Viewholder>{
 
     @Override
     public void onBindViewHolder(@NonNull PointsAdapter.Viewholder holder, int position) {
-        PointsData tmp = this.ptsAL.get(position);
-        holder.pts.setText(String.valueOf(tmp.getScore()));
-        holder.ply.setText(tmp.getPlayer());
+        String[] tmp = this.ptsAL.get(position);
+        holder.pts.setText(tmp[1]);
+        holder.ply.setText(tmp[0]);
 
         holder.pBtn.setOnClickListener(v -> {
-            PointsData temp = ptsAL.get(position);
-            int val = temp.getScore() + ptsAdd;
+            String[] temp = ptsAL.get(position);
+            int val = Integer.parseInt(temp[1]) + ptsAdd;
             holder.pts.setText(String.valueOf(val));
-            temp.setScore(val);
+            temp[1] = String.valueOf(val);
         });
 
         holder.mBtn.setOnClickListener(v -> {
-            PointsData temp = ptsAL.get(position);
-            int val = temp.getScore() - ptsMin;
+            String[] temp = ptsAL.get(position);
+            int val = Integer.parseInt(temp[1]) - ptsMin;
             holder.pts.setText(String.valueOf(val));
-            temp.setScore(val);
+            temp[1] = String.valueOf(val);
         });
     }
 
@@ -285,31 +278,3 @@ class PointsAdapter extends RecyclerView.Adapter<PointsAdapter.Viewholder>{
         }
     }
 }
-
-class PointsData {
-    private String player;
-    private int score;
-
-    public PointsData(String s, int p) {
-        this.player = s;
-        this.score = p;
-    }
-
-    public String getPlayer() {
-        return this.player;
-    }
-
-    public int getScore() {
-        return this.score;
-    }
-
-    public boolean setScore(int i) {
-        this.score = i;
-        return true;
-    }
-
-    public void setPlayer(String player) {
-        this.player = player;
-    }
-}
-

@@ -23,7 +23,7 @@ public class DiceFragment extends Fragment {
     private int[] range = {1, 6};
     private ArrayList<Integer> custom = new ArrayList<>();
 
-    private HistoryFragment diceHisFrg;
+    private HistoryFragment<int[]> diceHisFrg;
     private ArrayList<int[]>  diceHis;
 
 
@@ -37,7 +37,7 @@ public class DiceFragment extends Fragment {
 
         if (this.diceHis == null) {
             this.diceHis = new ArrayList<>();
-            this.diceHisFrg = new HistoryFragment(this.diceHis, 1);
+            this.diceHisFrg = new HistoryFragment<>(this.diceHis, 1);
         }
 
         this.dice = v.findViewById(R.id.dice);
