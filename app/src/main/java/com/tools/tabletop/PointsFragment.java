@@ -33,6 +33,7 @@ public class PointsFragment extends Fragment {
     private PointsData deleted;
 
     private View v;
+    private TextView msg;
     private RecyclerView rv;
     private ArrayList<PointsData> data;
     private ArrayList<PointsData> display;
@@ -81,7 +82,10 @@ public class PointsFragment extends Fragment {
                             display.add(pos, deleted);
                             data.add(pos, deleted);
                             rv.getAdapter().notifyItemInserted(pos);
+                            msg.setText("");
                         }).show();
+                if (display.size() == 0) msg.setText(R.string.kind_of_lonely_in_here);
+
             } else { // right
                 // code reference: https://youtu.be/eslYJArppnQ
 
@@ -95,8 +99,11 @@ public class PointsFragment extends Fragment {
                 builder.setView(et);
 
                 builder.setNeutralButton("Cancel", (d, v) -> {
-                    display.add(pos, target);
-                    rv.getAdapter().notifyItemInserted(pos);
+                    rv.getAdapter().notifyItemChanged(pos);
+                });
+
+                builder.setOnCancelListener(i -> {
+                    rv.getAdapter().notifyItemChanged(pos);
                 });
 
                 builder.setPositiveButton("Update", (d, v) -> {
@@ -120,12 +127,13 @@ public class PointsFragment extends Fragment {
 
         // Code Reference: https://youtu.be/xYmH61Ilglc
         this.rv = this.v.findViewById(R.id.pts_list);
+        this.msg = this.v.findViewById(R.id.empty_msg_2);
 
         if (this.data == null) {
             this.data = new ArrayList<>();
             Random r = new Random();
 
-            for (int i = 0; i < 15; i++)
+            for (int i = 0; i < 3; i++)
                 this.data.add(new PointsData("Player " + (i + 1), 1 + r.nextInt(99)));
 
             this.data.add(new PointsData("Unique", 1000));
@@ -135,6 +143,10 @@ public class PointsFragment extends Fragment {
 
         this.rv.setAdapter(new PointsAdapter(this.getContext(), this.display));
         this.itTh.attachToRecyclerView(this.rv);
+
+        if (data.size() > 0) {
+            this.msg.setText("");
+        }
 
         setHasOptionsMenu(true);
 
@@ -201,6 +213,7 @@ public class PointsFragment extends Fragment {
                     display.add(created);
                     rv.getAdapter().notifyItemChanged(display.size() - 1);
                 });
+                this.msg.setText("");
 
                 builder.show();
                 return true;
