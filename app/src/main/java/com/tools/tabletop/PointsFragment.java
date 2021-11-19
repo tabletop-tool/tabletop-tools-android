@@ -2,6 +2,7 @@ package com.tools.tabletop;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,14 +19,18 @@ import androidx.appcompat.widget.SearchView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Set;
 
 public class PointsFragment extends Fragment {
 
@@ -36,6 +41,8 @@ public class PointsFragment extends Fragment {
     private RecyclerView rv;
     private ArrayList<String[]> data;
     private ArrayList<String[]> display;
+
+    private PointsSetting setting;
 
     private ItemTouchHelper itTh = new ItemTouchHelper(new ItemTouchHelper.Callback() {
         @Override
@@ -61,6 +68,7 @@ public class PointsFragment extends Fragment {
             Collections.swap(data, start, end);
 
             rv.getAdapter().notifyItemMoved(start, end);
+            saveData();
             return true;
         }
 
@@ -82,8 +90,10 @@ public class PointsFragment extends Fragment {
                             data.add(pos, deleted);
                             rv.getAdapter().notifyItemInserted(pos);
                             msg.setText("");
+                            saveData();
                         }).show();
                 if (display.size() == 0) msg.setText(R.string.kind_of_lonely_in_here);
+                saveData();
 
             } else { // right
                 // code reference: https://youtu.be/eslYJArppnQ
@@ -109,6 +119,7 @@ public class PointsFragment extends Fragment {
                    target[0] = et.getText().toString();
                    data.get(pos)[0] = et.getText().toString();
                    rv.getAdapter().notifyItemChanged(pos);
+                   saveData();
                 });
 
                 builder.show();
@@ -130,11 +141,15 @@ public class PointsFragment extends Fragment {
 
         if (this.data == null) {
             this.data = new ArrayList<>();
-
             this.display = new ArrayList<>(this.data);
+            this.loadData();
         }
 
-        this.rv.setAdapter(new PointsAdapter(this.getContext(), this.display));
+        if (this.setting == null) this.setting = new PointsSetting();
+
+        PointsAdapter pa = new PointsAdapter(this.getContext(), this.display);
+        this.loadSetting(pa);
+        this.rv.setAdapter(pa);
         this.itTh.attachToRecyclerView(this.rv);
 
         if (data.size() > 0) {
@@ -144,6 +159,35 @@ public class PointsFragment extends Fragment {
         setHasOptionsMenu(true);
 
         return this.v;
+    }
+
+    public void loadData() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        Gson gson = new Gson();
+
+        data = gson.fromJson(
+                sp.getString("pts_data", ""),
+                new TypeToken<ArrayList<String[]>>() {}.getType()
+        );
+
+        if (data == null) this.data = new ArrayList<>();
+
+        display.addAll(data);
+    }
+
+    public void saveData() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences.Editor editor = sp.edit();
+        Gson gson = new Gson();
+
+        editor.putString("pts_data", gson.toJson(this.data));
+        editor.apply();
+    }
+
+    public void loadSetting(PointsAdapter ref) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        ref.ptsAdd = Integer.parseInt(sp.getString("pts_add", "10"));
+        ref.ptsMin = Integer.parseInt(sp.getString("pts_sub", "10"));
     }
 
     @Override
@@ -183,6 +227,14 @@ public class PointsFragment extends Fragment {
             }
         });
 
+        MenuItem s = menu.findItem(R.id.pts_settings);
+        s.setOnMenuItemClickListener(i -> {
+            requireActivity().getSupportFragmentManager().beginTransaction().replace(
+                    R.id.frg_container, this.setting
+            ).addToBackStack(null).commit();
+            return true;
+        });
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -205,6 +257,7 @@ public class PointsFragment extends Fragment {
                     data.add(created);
                     display.add(created);
                     rv.getAdapter().notifyItemChanged(display.size() - 1);
+                    saveData();
                 });
                 this.msg.setText("");
 
