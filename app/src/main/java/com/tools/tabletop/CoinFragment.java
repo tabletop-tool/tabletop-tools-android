@@ -54,7 +54,7 @@ public class CoinFragment extends Fragment {
             if (v1.getId() != R.id.coin_btn) return;
 
             int temp = rand.nextInt(100);
-            int now = -1;
+            int now;
 
             if (temp <= this.range - 1) now = 1;
             else now = 0;
@@ -76,7 +76,7 @@ public class CoinFragment extends Fragment {
     }
 
     private void loadSetting() {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
         this.range = sp.getInt("coin_ratio", 50);
     }
 

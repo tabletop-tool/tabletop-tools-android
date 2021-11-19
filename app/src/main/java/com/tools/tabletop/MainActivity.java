@@ -9,6 +9,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Guide followed for navigation bar and fragments: https://youtu.be/AL_1UDa9l3U
         getSupportFragmentManager().beginTransaction().replace(
-                R.id.frg_container, frgs.get(R.id.coin_flip)
+                R.id.frg_container, Objects.requireNonNull(frgs.get(R.id.coin_flip))
         ).commit();
 
         BottomNavigationView btmNav = findViewById(R.id.btm_nav);

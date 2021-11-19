@@ -1,7 +1,6 @@
 package com.tools.tabletop;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -30,7 +29,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
-import java.util.Set;
+import java.util.Objects;
 
 public class PointsFragment extends Fragment {
 
@@ -44,7 +43,7 @@ public class PointsFragment extends Fragment {
 
     private PointsSetting setting;
 
-    private ItemTouchHelper itTh = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+    private final ItemTouchHelper itTh = new ItemTouchHelper(new ItemTouchHelper.Callback() {
         @Override
         public int getMovementFlags(
                 @NonNull RecyclerView recyclerView,
@@ -67,7 +66,7 @@ public class PointsFragment extends Fragment {
             Collections.swap(display, start, end);
             Collections.swap(data, start, end);
 
-            rv.getAdapter().notifyItemMoved(start, end);
+            Objects.requireNonNull(rv.getAdapter()).notifyItemMoved(start, end);
             saveData();
             return true;
         }
@@ -81,7 +80,7 @@ public class PointsFragment extends Fragment {
                 deleted = data.get(pos);
                 display.remove(pos);
                 data.remove(pos);
-                rv.getAdapter().notifyItemRemoved(pos);
+                Objects.requireNonNull(rv.getAdapter()).notifyItemRemoved(pos);
 
                 Snackbar.make(
                         rv, String.format("Deleted: %s", deleted[0]),
@@ -107,18 +106,16 @@ public class PointsFragment extends Fragment {
                 builder.setCancelable(true);
                 builder.setView(et);
 
-                builder.setNeutralButton("Cancel", (d, v) -> {
-                    rv.getAdapter().notifyItemChanged(pos);
-                });
+                builder.setNeutralButton("Cancel", (d, v) ->
+                        Objects.requireNonNull(rv.getAdapter()).notifyItemChanged(pos));
 
-                builder.setOnCancelListener(i -> {
-                    rv.getAdapter().notifyItemChanged(pos);
-                });
+                builder.setOnCancelListener(i ->
+                        Objects.requireNonNull(rv.getAdapter()).notifyItemChanged(pos));
 
                 builder.setPositiveButton("Update", (d, v) -> {
                    target[0] = et.getText().toString();
                    data.get(pos)[0] = et.getText().toString();
-                   rv.getAdapter().notifyItemChanged(pos);
+                   Objects.requireNonNull(rv.getAdapter()).notifyItemChanged(pos);
                    saveData();
                 });
 
@@ -147,7 +144,7 @@ public class PointsFragment extends Fragment {
 
         if (this.setting == null) this.setting = new PointsSetting();
 
-        PointsAdapter pa = new PointsAdapter(this.getContext(), this.display);
+        PointsAdapter pa = new PointsAdapter(this.display);
         this.loadSetting(pa);
         this.rv.setAdapter(pa);
         this.itTh.attachToRecyclerView(this.rv);
@@ -162,7 +159,8 @@ public class PointsFragment extends Fragment {
     }
 
     public void loadData() {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        // code reference: https://youtu.be/TsASX0ZK9ak
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
         Gson gson = new Gson();
 
         data = gson.fromJson(
@@ -176,7 +174,8 @@ public class PointsFragment extends Fragment {
     }
 
     public void saveData() {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        // code reference: https://youtu.be/TsASX0ZK9ak
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
         SharedPreferences.Editor editor = sp.edit();
         Gson gson = new Gson();
 
@@ -185,7 +184,7 @@ public class PointsFragment extends Fragment {
     }
 
     public void loadSetting(PointsAdapter ref) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
         ref.ptsAdd = Integer.parseInt(sp.getString("pts_add", "10"));
         ref.ptsMin = Integer.parseInt(sp.getString("pts_sub", "10"));
     }
@@ -240,45 +239,40 @@ public class PointsFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.add_plyer:
-                EditText et = new EditText(v.getContext());
-                et.setText(R.string.new_ch);
+        if (item.getItemId() == R.id.add_plyer) {
+            EditText et = new EditText(v.getContext());
+            et.setText(R.string.new_ch);
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                builder.setTitle("New Points Tracker");
-                builder.setCancelable(true);
-                builder.setView(et);
+            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+            builder.setTitle("New Points Tracker");
+            builder.setCancelable(true);
+            builder.setView(et);
 
-                builder.setNeutralButton("Cancel", null);
+            builder.setNeutralButton("Cancel", null);
 
-                builder.setPositiveButton("Create", (d, v) -> {
-                    String[] created = {et.getText().toString(), "0"};
-                    data.add(created);
-                    display.add(created);
-                    rv.getAdapter().notifyItemChanged(display.size() - 1);
-                    saveData();
-                });
-                this.msg.setText("");
+            builder.setPositiveButton("Create", (d, v) -> {
+                String[] created = {et.getText().toString(), "0"};
+                data.add(created);
+                display.add(created);
+                Objects.requireNonNull(rv.getAdapter()).notifyItemChanged(display.size() - 1);
+                saveData();
+            });
+            this.msg.setText("");
 
-                builder.show();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
+            builder.show();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 }
 
 class PointsAdapter extends RecyclerView.Adapter<PointsAdapter.Viewholder>{
 
-    private Context ctx;
-    private ArrayList<String[]> ptsAL;
+    private final ArrayList<String[]> ptsAL;
     public Integer ptsAdd = 10;
     public Integer ptsMin = 10;
 
-    public PointsAdapter(Context ctx, ArrayList<String[]> ini) {
-        this.ctx = ctx;
+    public PointsAdapter(ArrayList<String[]> ini) {
         this.ptsAL = ini;
     }
 
@@ -319,8 +313,8 @@ class PointsAdapter extends RecyclerView.Adapter<PointsAdapter.Viewholder>{
     }
 
     public static class Viewholder extends RecyclerView.ViewHolder {
-        private TextView pts, ply;
-        private ImageButton pBtn, mBtn;
+        private final TextView pts, ply;
+        private final ImageButton pBtn, mBtn;
 
         public Viewholder(@NonNull View itemView) {
             super(itemView);

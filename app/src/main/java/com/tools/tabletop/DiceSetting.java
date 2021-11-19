@@ -16,11 +16,11 @@ public class DiceSetting extends PreferenceFragmentCompat {
 
         // code reference:
         // https://newbedev.com/how-to-set-only-numeric-value-for-edittextpreference-in-android
-        min.setOnBindEditTextListener(e -> {
-            e.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
-        });
-        max.setOnBindEditTextListener(e -> {
-            e.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
-        });
+        assert min != null;
+        min.setOnBindEditTextListener(e ->
+                e.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED));
+        assert max != null;
+        max.setOnBindEditTextListener(e ->
+                e.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED));
     }
 }

@@ -14,11 +14,9 @@ public class PointsSetting extends PreferenceFragmentCompat {
         EditTextPreference min = findPreference("pts_add");
         EditTextPreference max = findPreference("pts_sub");
 
-        min.setOnBindEditTextListener(e -> {
-            e.setInputType(InputType.TYPE_CLASS_NUMBER);
-        });
-        max.setOnBindEditTextListener(e -> {
-            e.setInputType(InputType.TYPE_CLASS_NUMBER);
-        });
+        assert min != null;
+        min.setOnBindEditTextListener(e -> e.setInputType(InputType.TYPE_CLASS_NUMBER));
+        assert max != null;
+        max.setOnBindEditTextListener(e -> e.setInputType(InputType.TYPE_CLASS_NUMBER));
     }
 }

@@ -23,7 +23,6 @@ public class DiceFragment extends Fragment {
     private Integer result = null;
     private static final Random rand = new Random();
     private int[] range = {1, 6};
-    private ArrayList<Integer> custom = new ArrayList<>();
 
     private HistoryFragment<int[]> diceHisFrg;
     private ArrayList<int[]>  diceHis;
@@ -63,7 +62,7 @@ public class DiceFragment extends Fragment {
     }
 
     public void loadSettings() {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
         int mini = Integer.parseInt(sp.getString("dice_min", "1"));
         int maxi = Integer.parseInt(sp.getString("dice_max", "6"));
         this.range = new int[]{mini, maxi};

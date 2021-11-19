@@ -23,14 +23,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class HistoryFragment<T> extends Fragment {
-    private int mode = -1;
+    private final int mode;
     private View v;
     private RecyclerView rv;
     private TextView tv;
 
-    private ArrayList<T> history;
+    private final ArrayList<T> history;
     private T deleted;
 
     public HistoryFragment(ArrayList<T> history, int type) {
@@ -66,7 +67,7 @@ public class HistoryFragment<T> extends Fragment {
 
             deleted = history.get(pos);
             history.remove(pos);
-            rv.getAdapter().notifyItemRemoved(pos);
+            Objects.requireNonNull(rv.getAdapter()).notifyItemRemoved(pos);
 
             Snackbar.make(rv, "Record Deleted",
                     Snackbar.LENGTH_LONG).setAction("Undo", view -> {
@@ -102,10 +103,10 @@ public class HistoryFragment<T> extends Fragment {
                 new CoinAdapter(this.getContext(), (ArrayList<Boolean>) this.history)
         );
         else if (mode == 1) this.rv.setAdapter(
-                new DiceAdapter(this.getContext(), (ArrayList<int[]>) this.history)
+                new DiceAdapter((ArrayList<int[]>) this.history)
         );
         else if (mode == 2) this.rv.setAdapter(
-                new SpinAdapter(this.getContext(), (ArrayList<String[]>) this.history)
+                new SpinAdapter((ArrayList<String[]>) this.history)
         );
         // should never reach the line below
         else tv.setText(getString(R.string.err));
@@ -191,11 +192,9 @@ class CoinAdapter extends RecyclerView.Adapter<CoinAdapter.Viewholder> {
 class DiceAdapter extends RecyclerView.Adapter<DiceAdapter.Viewholder> {
 
     private final ArrayList<int[]> diceHis;
-    private final Context ctx;
 
-    public DiceAdapter(Context ctx, ArrayList<int[]> ini) {
+    public DiceAdapter(ArrayList<int[]> ini) {
         this.diceHis = ini;
-        this.ctx = ctx;
     }
 
     @NonNull
@@ -233,11 +232,9 @@ class DiceAdapter extends RecyclerView.Adapter<DiceAdapter.Viewholder> {
 class SpinAdapter extends RecyclerView.Adapter<SpinAdapter.Viewholder> {
 
     private final ArrayList<String[]> spinHis;
-    private final Context ctx;
 
-    public SpinAdapter(Context ctx, ArrayList<String[]> ini) {
+    public SpinAdapter(ArrayList<String[]> ini) {
         this.spinHis = ini;
-        this.ctx = ctx;
     }
 
     @NonNull
