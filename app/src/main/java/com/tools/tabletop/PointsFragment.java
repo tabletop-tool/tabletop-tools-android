@@ -1,5 +1,6 @@
 package com.tools.tabletop;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -35,7 +36,6 @@ public class PointsFragment extends Fragment {
 
     private String[] deleted;
 
-    private View v;
     private TextView msg;
     private RecyclerView rv;
     private ArrayList<String[]> data;
@@ -98,10 +98,10 @@ public class PointsFragment extends Fragment {
                 // code reference: https://youtu.be/eslYJArppnQ
 
                 String[] target = display.get(pos);
-                EditText et = new EditText(v.getContext());
+                EditText et = new EditText(requireContext());
                 et.setText(target[0]);
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
                 builder.setTitle("Change Name");
                 builder.setCancelable(true);
                 builder.setView(et);
@@ -130,11 +130,11 @@ public class PointsFragment extends Fragment {
             @NonNull LayoutInflater inflater,
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
-        this.v = inflater.inflate(R.layout.fragment_points, container, false);
+        View v = inflater.inflate(R.layout.fragment_points, container, false);
 
         // Code Reference: https://youtu.be/xYmH61Ilglc
-        this.rv = this.v.findViewById(R.id.pts_list);
-        this.msg = this.v.findViewById(R.id.empty_msg_2);
+        this.rv = v.findViewById(R.id.pts_list);
+        this.msg = v.findViewById(R.id.empty_msg_2);
 
         if (this.data == null) {
             this.data = new ArrayList<>();
@@ -155,10 +155,10 @@ public class PointsFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        return this.v;
+        return v;
     }
 
-    public void loadData() {
+    private void loadData() {
         // code reference: https://youtu.be/TsASX0ZK9ak
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
         Gson gson = new Gson();
@@ -173,7 +173,7 @@ public class PointsFragment extends Fragment {
         display.addAll(data);
     }
 
-    public void saveData() {
+    private void saveData() {
         // code reference: https://youtu.be/TsASX0ZK9ak
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
         SharedPreferences.Editor editor = sp.edit();
@@ -183,7 +183,7 @@ public class PointsFragment extends Fragment {
         editor.apply();
     }
 
-    public void loadSetting(PointsAdapter ref) {
+    private void loadSetting(PointsAdapter ref) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
         ref.ptsAdd = Integer.parseInt(sp.getString("pts_add", "10"));
         ref.ptsMin = Integer.parseInt(sp.getString("pts_sub", "10"));
@@ -203,6 +203,7 @@ public class PointsFragment extends Fragment {
                 return true;
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (newText.isEmpty()) {
@@ -220,7 +221,7 @@ public class PointsFragment extends Fragment {
 
                 }
 
-                rv.getAdapter().notifyDataSetChanged();
+                Objects.requireNonNull(rv.getAdapter()).notifyDataSetChanged();
 
                 return true;
             }
@@ -240,10 +241,10 @@ public class PointsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.add_plyer) {
-            EditText et = new EditText(v.getContext());
+            EditText et = new EditText(requireContext());
             et.setText(R.string.new_ch);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
             builder.setTitle("New Points Tracker");
             builder.setCancelable(true);
             builder.setView(et);

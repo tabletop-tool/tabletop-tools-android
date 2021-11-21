@@ -61,8 +61,9 @@ public class DiceFragment extends Fragment {
         return v;
     }
 
-    public void loadSettings() {
+    private void loadSettings() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        // TODO: catch error "NumberFormatException"
         int mini = Integer.parseInt(sp.getString("dice_min", "1"));
         int maxi = Integer.parseInt(sp.getString("dice_max", "6"));
         this.range = new int[]{mini, maxi};

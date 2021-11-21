@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/clear_btn"
-        android:title="@string/clear"
-        android:icon="@drawable/ic_baseline_clear_all_24"
+        android:id="@+id/add_btn"
+        android:title="add"
+        android:icon="@drawable/ic_baseline_add_circle_outline_24"
         app:showAsAction="always|collapseActionView"/>
 </menu>

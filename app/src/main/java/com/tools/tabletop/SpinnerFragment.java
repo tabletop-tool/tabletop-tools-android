@@ -1,5 +1,6 @@
 package com.tools.tabletop;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,11 +19,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +48,7 @@ public class SpinnerFragment extends Fragment implements
 
     private ArrayList<String[]> spinHis;
     private HistoryFragment<String[]> spinHisFrg;
+    private SpinnerSetting setting;
 
     private ArrayList<String[]> custom;
 
@@ -54,18 +59,17 @@ public class SpinnerFragment extends Fragment implements
                              @Nullable Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_spinner, container, false);
 
-        if (spinHis == null) {
+        if (this.spinHis == null) {
             this.spinHis = new ArrayList<>();
             this.spinHisFrg = new HistoryFragment<>(this.spinHis, 2);
         }
 
-        if (custom == null) {
-            custom = new ArrayList<>();
+        if (this.setting == null) this.setting = new SpinnerSetting();
 
-            // TODO: temporary
-            custom.add(new String[]{"Red", "#d63031", "30f"});
-            custom.add(new String[]{"Blue", "#0984e3", "35f"});
+        if (this.custom == null) {
+            this.custom = new ArrayList<>();
         }
+        this.loadData();
 
         pC = v.findViewById(R.id.circular);
         p = v.findViewById(R.id.pointer);
@@ -88,6 +92,18 @@ public class SpinnerFragment extends Fragment implements
         return v;
     }
 
+    private void loadData() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        Gson gson = new Gson();
+
+        this.custom = gson.fromJson(
+                sp.getString("spin_data", ""),
+                new TypeToken<ArrayList<String[]>>() {}.getType()
+        );
+
+        if (this.custom == null) this.custom = new ArrayList<>();
+    }
+
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.basic_menu, menu);
@@ -96,6 +112,14 @@ public class SpinnerFragment extends Fragment implements
         history.setOnMenuItemClickListener(i -> {
             requireActivity().getSupportFragmentManager().beginTransaction().replace(
                     R.id.frg_container, this.spinHisFrg
+            ).addToBackStack(null).commit();
+            return true;
+        });
+
+        MenuItem setting = menu.findItem(R.id.settings_btn);
+        setting.setOnMenuItemClickListener(i -> {
+            requireActivity().getSupportFragmentManager().beginTransaction().replace(
+                    R.id.frg_container, this.setting
             ).addToBackStack(null).commit();
             return true;
         });
@@ -117,7 +141,7 @@ public class SpinnerFragment extends Fragment implements
         for (int i = 0; i < this.custom.size(); i++) {
             String[] data = this.custom.get(i);
             pe[i] = new PieEntry(Float.parseFloat(data[2]), data[0]);
-            colors[i] = Color.parseColor(data[1]);
+            colors[i] = Integer.parseInt(data[1]);
         }
 
         // the default

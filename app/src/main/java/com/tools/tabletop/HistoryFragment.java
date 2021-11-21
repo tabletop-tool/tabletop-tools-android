@@ -27,7 +27,6 @@ import java.util.Objects;
 
 public class HistoryFragment<T> extends Fragment {
     private final int mode;
-    private View v;
     private RecyclerView rv;
     private TextView tv;
 
@@ -91,11 +90,11 @@ public class HistoryFragment<T> extends Fragment {
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
 
-        this.v = inflater.inflate(R.layout.fragment_history, container, false);
-        this.rv = this.v.findViewById(R.id.history_list);
+        View v = inflater.inflate(R.layout.fragment_history, container, false);
+        this.rv = v.findViewById(R.id.history_list);
 
         if (this.history.size() > 0) {
-            this.tv = this.v.findViewById(R.id.empty_msg);
+            this.tv = v.findViewById(R.id.empty_msg);
             tv.setText("");
         }
 
@@ -114,7 +113,7 @@ public class HistoryFragment<T> extends Fragment {
         this.itTh.attachToRecyclerView(this.rv);
         setHasOptionsMenu(true);
 
-        return this.v;
+        return v;
     }
 
     @Override
@@ -124,7 +123,7 @@ public class HistoryFragment<T> extends Fragment {
     }
 
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("You sure you want to clear all history record(s)?");
         builder.setCancelable(true);
 
