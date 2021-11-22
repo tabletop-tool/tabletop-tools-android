@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,6 +29,7 @@ public class DiceFragment extends Fragment {
     private ArrayList<int[]>  diceHis;
 
     private DiceSetting setting;
+    private SharedPreferences sp;
 
     @Nullable
     @Override
@@ -42,12 +44,21 @@ public class DiceFragment extends Fragment {
             this.diceHisFrg = new HistoryFragment<>(this.diceHis, 1);
         }
 
+        if (this.sp == null) this.sp = PreferenceManager.getDefaultSharedPreferences(
+                requireContext());
+
         if (this.setting == null) this.setting = new DiceSetting();
 
         this.dice = v.findViewById(R.id.dice);
 
         this.dice.setOnClickListener(v1 -> {
             if (v1.getId() != R.id.dice) return;
+            if (this.range[0] > this.range[1]) {
+                Toast.makeText(requireContext(),
+                        "Uhhh, why is the min bigger than the max?",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
 
             this.changeDice();
             int[] insert = {this.result, this.range[0], this.range[1]};
@@ -62,10 +73,25 @@ public class DiceFragment extends Fragment {
     }
 
     private void loadSettings() {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
-        // TODO: catch error "NumberFormatException"
-        int mini = Integer.parseInt(sp.getString("dice_min", "1"));
-        int maxi = Integer.parseInt(sp.getString("dice_max", "6"));
+        int mini, maxi;
+        SharedPreferences.Editor editor = this.sp.edit();
+
+        try {
+            mini = Integer.parseInt(sp.getString("dice_min", "1"));
+        } catch (NumberFormatException e) {
+            mini = 1;
+            editor.putString("dice_min", "1");
+            editor.apply();
+        }
+
+        try {
+            maxi = Integer.parseInt(sp.getString("dice_max", "6"));
+        } catch (NumberFormatException e) {
+            maxi = 6;
+            editor.putString("dice_max", "6");
+            editor.apply();
+        }
+
         this.range = new int[]{mini, maxi};
     }
 

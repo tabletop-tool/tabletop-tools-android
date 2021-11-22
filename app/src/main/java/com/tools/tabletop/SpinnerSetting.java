@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -195,14 +196,24 @@ public class SpinnerSetting extends Fragment {
         if (position == -1) {
             builder.setTitle("Adding New Spinner Portion");
             builder.setPositiveButton("Add", (d, v) -> {
-                data.add(new String[]{
-                        et.getText().toString(),
-                        String.valueOf(c[0]),
-                        percent.getText().toString() });
-                Objects.requireNonNull(rv.getAdapter()).notifyItemInserted(data.size() - 1);
-                saveData();
-                tv.setText("");
-                // TODO add checks
+                String check1, check2;
+                check1 = et.getText().toString();
+                check2 = percent.getText().toString();
+                if (check1.equals("") || check2.equals("")) {
+                    Toast.makeText(
+                            requireContext(),
+                            "Invalid input, action aborted",
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    data.add(new String[]{
+                            check1,
+                            String.valueOf(c[0]),
+                            check2 });
+                    saveData();
+                    tv.setText("");
+                    Objects.requireNonNull(
+                            rv.getAdapter()).notifyItemInserted(data.size() - 1);
+                }
             });
         } else {
             String[] target = this.data.get(position);
@@ -214,13 +225,21 @@ public class SpinnerSetting extends Fragment {
 
             builder.setTitle("Editing Spinner Portion");
             builder.setPositiveButton("Update", (d, v) -> {
-                target[0] = et.getText().toString();
-                target[2] = percent.getText().toString();
-                target[1] = String.valueOf(c[0]);
+                String check1, check2;
+                check1 = et.getText().toString();
+                check2 = percent.getText().toString();
+                if (check1.equals("") || check2.equals("")) {
+                    Toast.makeText(
+                            requireContext(),
+                            "Invalid input, action aborted",
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    target[0] = check1;
+                    target[2] = check2;
+                    target[1] = String.valueOf(c[0]);
+                    saveData();
+                }
                 Objects.requireNonNull(rv.getAdapter()).notifyItemChanged(position);
-                saveData();
-
-                // TODO add checks
             });
         }
 
