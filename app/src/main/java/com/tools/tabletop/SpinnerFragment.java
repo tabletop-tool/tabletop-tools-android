@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.RotateAnimation;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -25,6 +24,7 @@ import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -74,7 +74,7 @@ public class SpinnerFragment extends Fragment implements
         pC = v.findViewById(R.id.circular);
         p = v.findViewById(R.id.pointer);
 
-        Button b = v.findViewById(R.id.cir_btn);
+        FloatingActionButton b = v.findViewById(R.id.cir_btn);
         b.setOnClickListener(this);
 
         pe = new PieEntry[this.custom.size() + 1];
