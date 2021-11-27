@@ -160,7 +160,6 @@ public class SpinnerSetting extends Fragment {
         l.addView(btn);
 
         et.setHint("Label Name");
-        percent.setFilters(new InputFilter[]{new CustomInputFilter(0, limit)});
         btn.setBackgroundColor(c[0]);
 
         percent.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
@@ -244,6 +243,7 @@ public class SpinnerSetting extends Fragment {
         }
 
         percent.setHint(String.format("Percentage: 0 - %.2f", limit));
+        percent.setFilters(new InputFilter[]{new CustomInputFilter(0, limit)});
 
         return builder;
     }

@@ -119,8 +119,17 @@ public class DiceFragment extends Fragment {
     }
 
     private void changeDice(boolean change) {
-        if (change)
-            this.result = rand.nextInt(this.range[1] - this.range[0] + 1) + this.range[0];
+        int temp = rand.nextInt(this.range[1] - this.range[0] + 1) + this.range[0];
+        if (change) {
+            try {
+                if (temp == this.result) Toast.makeText(
+                        requireContext(), "Got the same value!", Toast.LENGTH_SHORT
+                    ).show();
+                else this.result = temp;
+            } catch (NullPointerException npe) { // result is null
+                this.result = temp;
+            }
+        }
 
         dice.setText(String.valueOf(this.result));
         if (dice.getTextSize() != 80) dice.setTextSize(80);

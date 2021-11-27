@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -62,6 +63,10 @@ public class CoinFragment extends Fragment {
             if (this.result != now) {
                 this.result = now;
                 this.changeBtn();
+            } else {
+                Toast.makeText(
+                        requireContext(), "Got the same value!", Toast.LENGTH_SHORT
+                ).show();
             }
 
             if (result == 1) this.coinHis.add(0, true);
