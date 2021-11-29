@@ -4,7 +4,16 @@ import android.os.Bundle;
 
 import androidx.preference.PreferenceFragmentCompat;
 
+/**
+ * CoinSetting class that inherits from PreferenceFragmentCompat associated wit coin_preference
+ */
 public class CoinSetting extends PreferenceFragmentCompat {
+    /**
+     * method to be called to initialize preference view graphics
+     *
+     * @param savedInstanceState Bundle
+     * @param rootKey String
+     */
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.coin_preference, rootKey);

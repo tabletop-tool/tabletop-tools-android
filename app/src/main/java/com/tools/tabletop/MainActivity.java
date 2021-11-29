@@ -10,11 +10,23 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * MainActivity class inherit from AppCompatActivity.
+ * Responsible for activity_main layout and be considered the main / start code for the app.
+ */
 public class MainActivity extends AppCompatActivity {
+    /**
+     * Private Map variable with the component ID (int) as its key for the associated
+     * Fragment class
+     */
     private Map<Integer, Fragment> frgs;
-    private int curId = -1;
 
+    /**
+     * Method to be called on activity start that initialize necessarily components.
+     * This method should only be called by "system"
+     *
+     * @param savedInstanceState Bundle of the saved data from a saved instance if any
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Guide followed for navigation bar and fragments: https://youtu.be/AL_1UDa9l3U
@@ -28,11 +40,7 @@ public class MainActivity extends AppCompatActivity {
             put(R.id.more_options, new AdditionalFragment());
         }};
 
-        if (this.curId == -1) {
-            this.curId = R.id.coin_flip;
-        }
-
-        this.setFragment(frgs.get(this.curId));
+        this.setFragment(frgs.get(R.id.coin_flip));
 
         BottomNavigationView btmNav = findViewById(R.id.btm_nav);
         btmNav.setOnItemSelectedListener(item -> {
@@ -41,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Private method that replaces the fragment container in main activity with the passed in one
+     * @param frg the fragment to replace the existing one
+     */
     private void setFragment(Fragment frg) {
         getSupportFragmentManager().beginTransaction().replace(
                 R.id.frg_container, frg

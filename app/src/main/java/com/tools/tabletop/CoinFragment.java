@@ -20,18 +20,33 @@ import androidx.preference.PreferenceManager;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * CoinFragment class inherits from Fragment that is responsible for fragment_coin layout
+ */
 public class CoinFragment extends Fragment {
-    private int result = -1;
-    private static final Random rand = new Random();
-    private Button flipBtn;
+    private static final Random rand = new Random(); // random generator
 
-    private HistoryFragment<Boolean> coinHstFrg;
-    private CoinSetting cs;
+    private int result = -1; // current result
+    private Button flipBtn; // coin flip button
 
-    private int range = 50;
+    private HistoryFragment<Boolean> coinHstFrg; // coin flip history fragment
+    private CoinSetting cs; // coin setting preference fragment
 
+    private int range = 50; // ratio of head : tail
+
+    /**
+     * Array list of boolean representing the coin flip history, true for head else tail
+     */
     private ArrayList<Boolean> coinHis;
 
+    /**
+     * Method called to initialize view graphics
+     *
+     * @param inflater LayoutInflater
+     * @param container nullable ViewGroup
+     * @param savedInstanceState nullable savedInstance
+     * @return initialized view layout for the fragment
+     */
     @Nullable
     @Override
     public View onCreateView(
@@ -39,17 +54,18 @@ public class CoinFragment extends Fragment {
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
 
+        // initialize coin history fragment if null
         if (coinHis == null) {
             coinHis = new ArrayList<>();
             coinHstFrg = new HistoryFragment<>(this.coinHis, 0);
         }
 
-        if (cs == null) {
-            cs = new CoinSetting();
-        }
+        // initialize coin setting fragment if null
+        if (cs == null) cs = new CoinSetting();
 
         View v = inflater.inflate(R.layout.fragment_coin, container, false);
 
+        // initialize the coin fip button
         this.flipBtn = v.findViewById(R.id.coin_btn);
         this.flipBtn.setOnClickListener(v1 -> {
             if (v1.getId() != R.id.coin_btn) return;
@@ -64,6 +80,7 @@ public class CoinFragment extends Fragment {
                 this.result = now;
                 this.changeBtn();
             } else {
+                // toast message if user got the same result
                 Toast.makeText(
                         requireContext(), "Got the same value!", Toast.LENGTH_SHORT
                 ).show();
@@ -80,11 +97,17 @@ public class CoinFragment extends Fragment {
         return v;
     }
 
+    /**
+     * private method that sets the range variable with the one stored in SharedPreference
+     */
     private void loadSetting() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
         this.range = sp.getInt("coin_ratio", 50);
     }
 
+    /**
+     * private method that change the coin flip button color and text base on the result variable
+     */
     private void changeBtn() {
         if (this.result == 1) {
             flipBtn.setBackgroundColor(Color.parseColor("#0984e3"));
@@ -95,10 +118,17 @@ public class CoinFragment extends Fragment {
         }
     }
 
+    /**
+     * Method called to initialize menu view graphics
+     *
+     * @param menu Menu
+     * @param inflater MenuInflater
+     */
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.basic_menu, menu);
 
+        // history button that sets a backtrack coin history fragment on button press
         MenuItem history = menu.findItem(R.id.history_btn);
         history.setOnMenuItemClickListener(i -> {
             requireActivity().getSupportFragmentManager().beginTransaction().replace(
@@ -107,6 +137,7 @@ public class CoinFragment extends Fragment {
             return true;
         });
 
+        // setting button that sets a backtrack coin setting fragment on button press
         MenuItem settings = menu.findItem(R.id.settings_btn);
         settings.setOnMenuItemClickListener(i -> {
             requireActivity().getSupportFragmentManager().beginTransaction().replace(

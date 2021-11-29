@@ -33,25 +33,37 @@ import java.util.Arrays;
 import java.util.Random;
 
 
+/**
+ * SpinnerFragment class inherits from Fragment and implements View.OnClickListener and
+ * Animation.AnimationListener. This class is associated with fragment_spinner.
+ */
 public class SpinnerFragment extends Fragment implements
         View.OnClickListener, Animation.AnimationListener {
-    private View v;
+    private static final Random rdm = new Random(); // random generator
+    private View v; // view variable associated with fragment_spinner
 
-    private PieChart pC;
-    private ImageView p;
+    private PieChart pC; // pie chart display for the spinner
+    private ImageView p; // image of the pointer
 
-    private PieEntry[] pe;
-    private int[] colors;
-    private static final Random rdm = new Random();
-    private float dgr = -98764f;
-    private boolean spinning = false;
+    private PieEntry[] pe; // pie chart data (label and value)
+    private int[] colors; // pie chart color
+    private float dgr = -98764f; // current degree for the pointer
+    private boolean spinning = false; // whether or not spinner is spinning at the moment
 
-    private ArrayList<String[]> spinHis;
-    private HistoryFragment<String[]> spinHisFrg;
-    private SpinnerSetting setting;
+    private ArrayList<String[]> spinHis; // spinner history
+    private HistoryFragment<String[]> spinHisFrg; // spinner history fragment
+    private SpinnerSetting setting; // spinner setting preference fragment
 
-    private ArrayList<String[]> custom;
+    private ArrayList<String[]> custom; // data of user's custom pie chart
 
+    /**
+     * Method called to initialize view graphics
+     *
+     * @param inflater LayoutInflater
+     * @param container nullable ViewGroup
+     * @param savedInstanceState nullable savedInstance
+     * @return initialized view layout for the fragment
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -59,18 +71,20 @@ public class SpinnerFragment extends Fragment implements
                              @Nullable Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_spinner, container, false);
 
+        // initialize spinner history if null
         if (this.spinHis == null) {
             this.spinHis = new ArrayList<>();
             this.spinHisFrg = new HistoryFragment<>(this.spinHis, 2);
         }
 
+        // initialize spinner setting if null
         if (this.setting == null) this.setting = new SpinnerSetting();
 
-        if (this.custom == null) {
-            this.custom = new ArrayList<>();
-        }
+        // initialize user's custom pie chart data if null
+        if (this.custom == null) this.custom = new ArrayList<>();
         this.loadData();
 
+        // initialize pie chart
         pC = v.findViewById(R.id.circular);
         p = v.findViewById(R.id.pointer);
 
@@ -80,7 +94,12 @@ public class SpinnerFragment extends Fragment implements
         pe = new PieEntry[this.custom.size() + 1];
         colors = new int[this.custom.size() + 1];
 
-        this.pieChartSetup();
+        // pie chart setup
+        pC.setDrawHoleEnabled(false);
+        pC.setRotationEnabled(false);
+        pC.getDescription().setEnabled(false);
+        pC.getLegend().setEnabled(false);
+        pC.setDrawEntryLabels(false);
         this.loadPieChart();
 
         if (this.dgr == -98764f) this.dgr = 0f;
@@ -92,6 +111,9 @@ public class SpinnerFragment extends Fragment implements
         return v;
     }
 
+    /**
+     * private method that loads custom variable with data from shared preference
+     */
     private void loadData() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
         Gson gson = new Gson();
@@ -104,6 +126,12 @@ public class SpinnerFragment extends Fragment implements
         if (this.custom == null) this.custom = new ArrayList<>();
     }
 
+    /**
+     * Method called to initialize menu view graphics
+     *
+     * @param menu Menu
+     * @param inflater MenuInflater
+     */
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.basic_menu, menu);
@@ -128,14 +156,9 @@ public class SpinnerFragment extends Fragment implements
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    private void pieChartSetup() {
-        pC.setDrawHoleEnabled(false);
-        pC.setRotationEnabled(false);
-        pC.getDescription().setEnabled(false);
-        pC.getLegend().setEnabled(false);
-        pC.setDrawEntryLabels(false);
-    }
-
+    /**
+     * private method that initialize the pie chart with data from custom variable
+     */
     private void loadPieChart() {
         // code reference: https://youtu.be/S3zqxVoIUig
         for (int i = 0; i < this.custom.size(); i++) {
@@ -161,6 +184,10 @@ public class SpinnerFragment extends Fragment implements
         pC.invalidate();
     }
 
+    /**
+     * method associated with the spinner button click action
+     * @param v View
+     */
     @Override
     public void onClick(View v) {
         // code reference: https://youtu.be/5O2Uox-TR00
@@ -190,11 +217,17 @@ public class SpinnerFragment extends Fragment implements
 
     }
 
+    /**
+     * method associated with the spinner image's end animation processing
+     *
+     * @param animation Animation
+     */
     @Override
     public void onAnimationEnd(Animation animation) {
         int result = -1;
         float temp = 0f;
 
+        // calculate result
         for (int i = 0; i < pe.length; i++) {
             float prev = temp;
             temp += 360 / (100 / pe[i].getValue());
@@ -204,6 +237,7 @@ public class SpinnerFragment extends Fragment implements
             }
         }
 
+        // notify user of result
         String txt = "...";
         if (result > -1) txt = pe[result].getLabel();
 

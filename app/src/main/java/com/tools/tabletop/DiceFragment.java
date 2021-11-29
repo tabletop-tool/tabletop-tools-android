@@ -19,18 +19,30 @@ import androidx.preference.PreferenceManager;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * DiceFragment class inherits from Fragment and is associated wit fragment_dice
+ */
 public class DiceFragment extends Fragment {
-    private Button dice;
-    private Integer result = null;
-    private static final Random rand = new Random();
+    private static final Random rand = new Random(); // random generator
+
+    private Button dice; // dice button
+    private Integer result = null; // integer result of the current roll
     private int[] range = {1, 6};
 
-    private HistoryFragment<int[]> diceHisFrg;
-    private ArrayList<int[]>  diceHis;
+    private HistoryFragment<int[]> diceHisFrg; // Dice history fragment variable
+    private ArrayList<int[]> diceHis; // Array list of the dice history in int
 
-    private DiceSetting setting;
-    private SharedPreferences sp;
+    private DiceSetting setting; // Dice setting preference fragment
+    private SharedPreferences sp; // Shared Preference reference
 
+    /**
+     * Method called to initialize view graphics
+     *
+     * @param inflater LayoutInflater
+     * @param container nullable ViewGroup
+     * @param savedInstanceState nullable savedInstance
+     * @return initialized view layout for the fragment
+     */
     @Nullable
     @Override
     public View onCreateView(
@@ -39,20 +51,22 @@ public class DiceFragment extends Fragment {
             @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_dice, container, false);
 
+        // initialize dice history if null
         if (this.diceHis == null) {
             this.diceHis = new ArrayList<>();
             this.diceHisFrg = new HistoryFragment<>(this.diceHis, 1);
         }
 
+        // get shared preference reference if null
         if (this.sp == null) this.sp = PreferenceManager.getDefaultSharedPreferences(
                 requireContext());
 
+        // initialize dice setting if null
         if (this.setting == null) this.setting = new DiceSetting();
 
+        // initialize dice button
         this.dice = v.findViewById(R.id.dice);
-
         this.dice.setOnClickListener(v1 -> {
-            if (v1.getId() != R.id.dice) return;
             if (this.range[0] > this.range[1]) {
                 Toast.makeText(requireContext(),
                         "Uhhh, why is the min bigger than the max?",
@@ -60,7 +74,7 @@ public class DiceFragment extends Fragment {
                 return;
             }
 
-            this.changeDice();
+            this.changeDice(true);
             int[] insert = {this.result, this.range[0], this.range[1]};
             this.diceHis.add(0, insert);
         });
@@ -72,6 +86,9 @@ public class DiceFragment extends Fragment {
         return v;
     }
 
+    /**
+     * private method that loads the range variable with integers from shared preference
+     */
     private void loadSettings() {
         int mini, maxi;
         SharedPreferences.Editor editor = this.sp.edit();
@@ -95,6 +112,12 @@ public class DiceFragment extends Fragment {
         this.range = new int[]{mini, maxi};
     }
 
+    /**
+     * Method called to initialize menu view graphics
+     *
+     * @param menu Menu
+     * @param inflater MenuInflater
+     */
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.basic_menu, menu);
@@ -118,9 +141,14 @@ public class DiceFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    /**
+     * private method that changes the dice base on the result variable
+     * @param change boolean indicate whether or not a new random result should be generated
+     */
     private void changeDice(boolean change) {
-        int temp = rand.nextInt(this.range[1] - this.range[0] + 1) + this.range[0];
         if (change) {
+            int temp = rand.nextInt(this.range[1] - this.range[0] + 1) + this.range[0];
+
             try {
                 if (temp == this.result) Toast.makeText(
                         requireContext(), "Got the same value!", Toast.LENGTH_SHORT
@@ -133,9 +161,5 @@ public class DiceFragment extends Fragment {
 
         dice.setText(String.valueOf(this.result));
         if (dice.getTextSize() != 80) dice.setTextSize(80);
-    }
-
-    private void changeDice() {
-        this.changeDice(true);
     }
 }

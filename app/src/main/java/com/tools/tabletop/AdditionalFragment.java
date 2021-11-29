@@ -1,5 +1,6 @@
 package com.tools.tabletop;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,8 +21,20 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
+/**
+ * AdditionalFragment class inherited from Fragment that is responsible for fragment_more layout
+ */
 public class AdditionalFragment extends Fragment {
 
+    /**
+     * Method called to initialize view graphics
+     *
+     * @param inflater LayoutInflater
+     * @param container nullable ViewGroup
+     * @param savedInstanceState nullable savedInstance
+     * @return initialized view layout for the fragment
+     */
+    @SuppressLint({"ApplySharedPref", "SetTextI18n"})
     @Nullable
     @Override
     public View onCreateView(
@@ -30,6 +43,7 @@ public class AdditionalFragment extends Fragment {
             @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_more, container, false);
 
+        // code for share button
         CardView share = v.findViewById(R.id.share_section);
         share.setOnClickListener(c -> {
             // code reference: https://youtu.be/i41rmT-GDXc
@@ -41,6 +55,7 @@ public class AdditionalFragment extends Fragment {
             startActivity(Intent.createChooser(intent, "Share using"));
         });
 
+        // code for the reset button
         CardView reset = v.findViewById(R.id.reset_section);
         reset.setOnClickListener(c -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
@@ -49,6 +64,7 @@ public class AdditionalFragment extends Fragment {
 
             builder.setNeutralButton("No", null);
 
+            // code that sets the positive button to reset all data stored back to its default state
             builder.setPositiveButton("Yes", (d, i) -> {
                 SharedPreferences sp = PreferenceManager.
                         getDefaultSharedPreferences(requireContext());
@@ -66,6 +82,8 @@ public class AdditionalFragment extends Fragment {
                 editor.putString("pts_data", gson.toJson(empty));
                 editor.putString("spin_data", gson.toJson(empty));
 
+                // must be commit instead of apply as we are restarting the app right after to
+                // ensure data is saved
                 editor.commit();
 
                 // code from:
@@ -78,6 +96,7 @@ public class AdditionalFragment extends Fragment {
             builder.show();
         });
 
+        // code for version display
         TextView tv = v.findViewById(R.id.version);
         String version;
 
@@ -86,6 +105,7 @@ public class AdditionalFragment extends Fragment {
                     requireContext().getPackageName(), 0
             ).versionName;
         } catch (PackageManager.NameNotFoundException ignore) {
+            // should never reach here but just in case
             version = "unknown";
         }
 
