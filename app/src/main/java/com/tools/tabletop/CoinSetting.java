@@ -10,9 +10,6 @@ import androidx.preference.PreferenceFragmentCompat;
 public class CoinSetting extends PreferenceFragmentCompat {
     /**
      * method to be called to initialize preference view graphics
-     *
-     * @param savedInstanceState Bundle
-     * @param rootKey String
      */
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {

@@ -24,8 +24,6 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Method to be called on activity start that initialize necessarily components.
      * This method should only be called by "system"
-     *
-     * @param savedInstanceState Bundle of the saved data from a saved instance if any
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -12,9 +12,6 @@ import androidx.preference.PreferenceFragmentCompat;
 public class DiceSetting extends PreferenceFragmentCompat {
     /**
      * method to be called to initialize preference view graphics
-     *
-     * @param savedInstanceState Bundle
-     * @param rootKey String
      */
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {

@@ -1,5 +1,6 @@
 package com.tools.tabletop;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -36,15 +37,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
 
+/**
+ * SpinnerSetting inherits Fragment and is associated with fragment_spin_setting
+ */
 public class SpinnerSetting extends Fragment {
-    private SharedPreferences sp;
-    private ArrayList<String[]> data;
+    private SharedPreferences sp; // shared preference reference
+    private ArrayList<String[]> data; // data of the user custom pie chart
 
-    private String[] deleted;
-    private RecyclerView rv;
-    private TextView tv;
+    private String[] deleted; // recently deleted pie chart portion
+    private RecyclerView rv; // recycler view
+    private TextView tv; // text view for notifying empty list
 
+    /**
+     * item touch helper for the recycler view
+     */
     private final ItemTouchHelper itTh = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+        /**
+         * method that sets the allowed movement for the item within the recycler view
+         */
         @Override
         public int getMovementFlags(
                 @NonNull RecyclerView recyclerView,
@@ -55,6 +65,9 @@ public class SpinnerSetting extends Fragment {
             );
         }
 
+        /**
+         * Method responsible for movable item position within recycler view
+         */
         @Override
         public boolean onMove(
                 @NonNull RecyclerView recyclerView,
@@ -71,12 +84,15 @@ public class SpinnerSetting extends Fragment {
             return true;
         }
 
+        /**
+         * Method responsible for item swipe action
+         */
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
             // code reference: https://youtu.be/Aup-aPj24eU
             int pos = viewHolder.getAdapterPosition();
 
-            if (direction == ItemTouchHelper.LEFT) {
+            if (direction == ItemTouchHelper.LEFT) { // left swipe, remove portion
                 deleted = data.get(pos);
                 data.remove(pos);
                 Objects.requireNonNull(rv.getAdapter()).notifyItemRemoved(pos);
@@ -92,7 +108,7 @@ public class SpinnerSetting extends Fragment {
                 if (data.size() == 0) tv.setText(R.string.only_default);
                 saveData();
 
-            } else { // right
+            } else { // swipe right, editing portion
                 // code reference: https://youtu.be/eslYJArppnQ
 
                 createBuilder(pos).show();
@@ -100,6 +116,9 @@ public class SpinnerSetting extends Fragment {
         }
     });
 
+    /**
+     * Method called to initialize view graphics
+     */
     @Nullable
     @Override
     public View onCreateView(
@@ -108,6 +127,7 @@ public class SpinnerSetting extends Fragment {
             @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_spin_setting, container, false);
 
+        // get shared preference if null
         if(sp == null) sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
         loadData();
 
@@ -123,6 +143,9 @@ public class SpinnerSetting extends Fragment {
         return v;
     }
 
+    /**
+     * Method called to initialize menu view graphics
+     */
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.spin_setting_menu, menu);
@@ -137,7 +160,15 @@ public class SpinnerSetting extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    /**
+     * Method that
+     *
+     * @param position int position of data to build AlertDialog on or -1 for a fresh build
+     * @return AlertDialog.Builder with info of param input or completely new
+     */
+    @SuppressLint("DefaultLocale")
     private AlertDialog.Builder createBuilder(int position) {
+        // calculating maximum input limit
         float limit = 0f;
         for (String[] i: this.data) limit += Float.parseFloat(i[2]);
         limit = 100 - limit;
@@ -149,6 +180,7 @@ public class SpinnerSetting extends Fragment {
         if (position == -1) c[0] = Color.RED;
         else c[0] = Integer.parseInt(this.data.get(position)[1]);
 
+        // build multiple inputs on AlertDialog with a linear layout
         LinearLayout l = new LinearLayout(builder.getContext());
         l.setOrientation(LinearLayout.VERTICAL);
 
@@ -163,6 +195,8 @@ public class SpinnerSetting extends Fragment {
         btn.setBackgroundColor(c[0]);
 
         percent.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
+        // color picker button
         btn.setText(R.string.set_color);
         btn.setOnClickListener(n -> {
             ColorPickerPopUp cp = new ColorPickerPopUp(builder.getContext());
@@ -187,34 +221,32 @@ public class SpinnerSetting extends Fragment {
         builder.setCancelable(true);
         builder.setView(l);
 
+        // cancelling action for AlertDialog
         builder.setNeutralButton("Cancel", (d, v) ->
                 Objects.requireNonNull(rv.getAdapter()).notifyItemChanged(position));
         builder.setOnCancelListener(k ->
                 Objects.requireNonNull(rv.getAdapter()).notifyItemChanged(position));
 
-        if (position == -1) {
+        if (position == -1) { // if param require data insertion
             builder.setTitle("Adding New Spinner Portion");
             builder.setPositiveButton("Add", (d, v) -> {
                 String check1, check2;
                 check1 = et.getText().toString();
                 check2 = percent.getText().toString();
-                if (check1.equals("") || check2.equals("")) {
+                if (check1.equals("") || check2.equals("")) { // empty input check
                     Toast.makeText(
                             requireContext(),
                             "Invalid input, action aborted",
                             Toast.LENGTH_LONG).show();
                 } else {
-                    data.add(new String[]{
-                            check1,
-                            String.valueOf(c[0]),
-                            check2 });
+                    data.add(new String[]{check1, String.valueOf(c[0]), check2 });
                     saveData();
                     tv.setText("");
                     Objects.requireNonNull(
                             rv.getAdapter()).notifyItemInserted(data.size() - 1);
                 }
             });
-        } else {
+        } else { // editing existing data portion
             String[] target = this.data.get(position);
 
             et.setText(target[0]);
@@ -227,7 +259,7 @@ public class SpinnerSetting extends Fragment {
                 String check1, check2;
                 check1 = et.getText().toString();
                 check2 = percent.getText().toString();
-                if (check1.equals("") || check2.equals("")) {
+                if (check1.equals("") || check2.equals("")) { // empty input check
                     Toast.makeText(
                             requireContext(),
                             "Invalid input, action aborted",
@@ -238,16 +270,21 @@ public class SpinnerSetting extends Fragment {
                     target[1] = String.valueOf(c[0]);
                     saveData();
                 }
+                // valid or invalid input, still restore item back to display (data already exist)
                 Objects.requireNonNull(rv.getAdapter()).notifyItemChanged(position);
             });
         }
 
-        percent.setHint(String.format("Percentage: 0 - %.2f", limit));
+        // display acceptable percentage input for the user
+        percent.setHint(String.format("Percentage: 0.00 - %.2f", limit));
         percent.setFilters(new InputFilter[]{new CustomInputFilter(0, limit)});
 
         return builder;
     }
 
+    /**
+     * Method that loads data from shared preference into data ArrayList
+     */
     private void loadData() {
         Gson gson = new Gson();
 
@@ -259,6 +296,9 @@ public class SpinnerSetting extends Fragment {
         if (data == null) this.data = new ArrayList<>();
     }
 
+    /**
+     * Method that saves data from the current data into shared preference (storage)
+     */
     private void saveData() {
         SharedPreferences.Editor edit = sp.edit();
         Gson gson = new Gson();
@@ -267,17 +307,29 @@ public class SpinnerSetting extends Fragment {
         edit.apply();
     }
 
+    /**
+     * Private class specifically for percent edit text input to be float and match specified range.
+     * Inherits from InputFilter.
+     */
     private static class CustomInputFilter implements InputFilter {
         // some code from:
         // https://stackoverflow.com/questions/14212518/is-there-a-way-to-define-a-min-and-max-value-for-edittext-in-android
 
-        private final float min, max;
+        private final float min, max; // the acceptable min and max
 
+        /**
+         * Constructor of CustomInputFilter class
+         * @param min minimum float input
+         * @param max maximum float input
+         */
         public CustomInputFilter(float min, float max) {
             this.min = min;
             this.max = max;
         }
 
+        /**
+         * Filter method to be utilized by edit text
+         */
         @Override
         public CharSequence filter(
                 CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
@@ -293,14 +345,25 @@ public class SpinnerSetting extends Fragment {
     }
 }
 
+/**
+ * SpinnerCustomAdapter class inherits from RecyclerView.Adapter that deals with card_spin_setting
+ * view within recycler view.
+ */
 class SpinnerCustomAdapter extends RecyclerView.Adapter<SpinnerCustomAdapter.Viewholder> {
 
-    private final ArrayList<String[]> custom;
+    private final ArrayList<String[]> custom; // reference to the pie chart custom portion ArrayList
 
+    /**
+     * Constructor for the SpinnerCustomAdapter class
+     * @param custom custom pie chart portion ArrayList reference
+     */
     SpinnerCustomAdapter(ArrayList<String[]> custom) {
         this.custom = custom;
     }
 
+    /**
+     * Method responsible for generating the view of the item(s) within recycler view
+     */
     @NonNull
     @Override
     public SpinnerCustomAdapter.Viewholder onCreateViewHolder(
@@ -311,15 +374,26 @@ class SpinnerCustomAdapter extends RecyclerView.Adapter<SpinnerCustomAdapter.Vie
         return new SpinnerCustomAdapter.Viewholder(view);
     }
 
+    /**
+     * Method that returns total item count
+     * @return total item count within the "recycler list"
+     */
     @Override
     public int getItemCount() {
         return this.custom.size();
     }
 
+    /**
+     * Viewholder (pie chart portion setting of spinner) that inherits from RecyclerView.ViewHolder
+     */
     public static class Viewholder extends RecyclerView.ViewHolder {
-        private final CardView bk;
-        private final TextView label, per;
+        private final CardView bk; // card view from card_spin_setting
+        private final TextView label, per; // text views from card_spin_setting
 
+        /**
+         * Constructor of Viewholder (pie chart portion setting of spinner) class
+         * @param itemView View
+         */
         public Viewholder(@NonNull View itemView) {
             super(itemView);
             this.bk = itemView.findViewById(R.id.card_spin_setting);
@@ -328,6 +402,10 @@ class SpinnerCustomAdapter extends RecyclerView.Adapter<SpinnerCustomAdapter.Vie
         }
     }
 
+    /**
+     * Method that modifies the item view base on tracker data
+     */
+    @SuppressLint("DefaultLocale")
     @Override
     public void onBindViewHolder(@NonNull SpinnerCustomAdapter.Viewholder holder, int position) {
         String[] tmp = this.custom.get(position);

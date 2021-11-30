@@ -32,18 +32,27 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Objects;
 
+/**
+ * PointsFragment inherits from Fragment and associated with fragment_points
+ */
 public class PointsFragment extends Fragment {
 
-    private String[] deleted;
+    private String[] deleted; // the most recently deleted points tracker
 
-    private TextView msg;
-    private RecyclerView rv;
-    private ArrayList<String[]> data;
-    private ArrayList<String[]> display;
+    private TextView msg; // text view to display empty list notifier
+    private RecyclerView rv; // recycler view
+    private ArrayList<String[]> data; // data of the points tracker
+    private ArrayList<String[]> display; // array list of points tracker currently on screen
 
-    private PointsSetting setting;
+    private PointsSetting setting; // points setting fragment
 
+    /**
+     * item touch helper for the recycler view
+     */
     private final ItemTouchHelper itTh = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+        /**
+         * method that sets the allowed movement for the item within the recycler view
+         */
         @Override
         public int getMovementFlags(
                 @NonNull RecyclerView recyclerView,
@@ -54,6 +63,9 @@ public class PointsFragment extends Fragment {
             );
         }
 
+        /**
+         * Method responsible for movable item position within recycler view
+         */
         @Override
         public boolean onMove(
                 @NonNull RecyclerView recyclerView,
@@ -71,17 +83,20 @@ public class PointsFragment extends Fragment {
             return true;
         }
 
+        /**
+         * Method responsible for item swipe action
+         */
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
             // code reference: https://youtu.be/Aup-aPj24eU
             int pos = viewHolder.getAdapterPosition();
 
-            if (direction == ItemTouchHelper.LEFT) {
-                deleted = data.get(pos);
+            if (direction == ItemTouchHelper.LEFT) { // left swipe for deletion
                 display.remove(pos);
-                data.remove(pos);
+                deleted = data.remove(pos);
                 Objects.requireNonNull(rv.getAdapter()).notifyItemRemoved(pos);
 
+                // bottom "backtrack" for the recently deleted item
                 Snackbar.make(
                         rv, String.format("Deleted: %s", deleted[0]),
                         Snackbar.LENGTH_LONG).setAction("Undo", view -> {
@@ -94,9 +109,9 @@ public class PointsFragment extends Fragment {
                 if (display.size() == 0) msg.setText(R.string.kind_of_lonely_in_here);
                 saveData();
 
-            } else { // right
-                // code reference: https://youtu.be/eslYJArppnQ
+            } else { // right swipe for edit / updating data
 
+                // code reference: https://youtu.be/eslYJArppnQ
                 String[] target = display.get(pos);
                 EditText et = new EditText(requireContext());
                 et.setText(target[0]);
@@ -109,6 +124,7 @@ public class PointsFragment extends Fragment {
                 builder.setNeutralButton("Cancel", (d, v) ->
                         Objects.requireNonNull(rv.getAdapter()).notifyItemChanged(pos));
 
+                // event listener to restore the item when "blank spaces" are touched
                 builder.setOnCancelListener(i ->
                         Objects.requireNonNull(rv.getAdapter()).notifyItemChanged(pos));
 
@@ -124,6 +140,9 @@ public class PointsFragment extends Fragment {
         }
     });
 
+    /**
+     * Method called to initialize view graphics
+     */
     @Nullable
     @Override
     public View onCreateView(
@@ -136,6 +155,7 @@ public class PointsFragment extends Fragment {
         this.rv = v.findViewById(R.id.pts_list);
         this.msg = v.findViewById(R.id.empty_msg_2);
 
+        // initialize data and display ArrayList if null
         if (this.data == null) {
             this.data = new ArrayList<>();
             this.display = new ArrayList<>(this.data);
@@ -149,15 +169,16 @@ public class PointsFragment extends Fragment {
         this.rv.setAdapter(pa);
         this.itTh.attachToRecyclerView(this.rv);
 
-        if (data.size() > 0) {
-            this.msg.setText("");
-        }
+        if (data.size() > 0) this.msg.setText("");
 
         setHasOptionsMenu(true);
 
         return v;
     }
 
+    /**
+     * Method that loads data from shared preference into data and display ArrayList
+     */
     private void loadData() {
         // code reference: https://youtu.be/TsASX0ZK9ak
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
@@ -173,6 +194,9 @@ public class PointsFragment extends Fragment {
         display.addAll(data);
     }
 
+    /**
+     * Method that saves data from the current data variable into shared preference (storage)
+     */
     private void saveData() {
         // code reference: https://youtu.be/TsASX0ZK9ak
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
@@ -183,33 +207,47 @@ public class PointsFragment extends Fragment {
         editor.apply();
     }
 
+    /**
+     * Loads the add and subtract integer from shared preference into the passed in PointsAdapter
+     * @param ref PointsAdapter to change the ptsAdd and ptsMin variable
+     */
     private void loadSetting(PointsAdapter ref) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
         ref.ptsAdd = Integer.parseInt(sp.getString("pts_add", "10"));
         ref.ptsMin = Integer.parseInt(sp.getString("pts_sub", "10"));
     }
 
+    /**
+     * Method called to initialize menu view graphics
+     */
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.points_menu, menu);
 
         // code reference: https://youtu.be/V1aLOkwV84o
 
+        // code for the search button / feature
         MenuItem search = menu.findItem(R.id.search);
         SearchView sv = (SearchView) search.getActionView();
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            /**
+             * Method for handling action when search text is submitted
+             */
             @Override
             public boolean onQueryTextSubmit(String query) {
-                return true;
+                return false; // default handling
             }
 
+            /**
+             * Method for handling query text change
+             */
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText.isEmpty()) {
+                if (newText.isEmpty()) { // empty text, add all data back to display
                     display.clear();
                     display.addAll(data);
-                } else {
+                } else { // input -> if the text is found within the name in any form
                     display.clear();
                     newText = newText.toLowerCase(Locale.getDefault());
 
@@ -227,6 +265,7 @@ public class PointsFragment extends Fragment {
             }
         });
 
+        // points setting menu
         MenuItem s = menu.findItem(R.id.pts_settings);
         s.setOnMenuItemClickListener(i -> {
             requireActivity().getSupportFragmentManager().beginTransaction().replace(
@@ -238,6 +277,10 @@ public class PointsFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    /**
+     * Method for handling when an item is selected from the menu, specifically for adding
+     * a new tracker in this case
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.add_plyer) {
@@ -267,16 +310,27 @@ public class PointsFragment extends Fragment {
     }
 }
 
+/**
+ * PointsAdapter class inherits from RecyclerView.Adapter that deals with card_pts view within
+ * recycler view.
+ */
 class PointsAdapter extends RecyclerView.Adapter<PointsAdapter.Viewholder>{
 
-    private final ArrayList<String[]> ptsAL;
-    public Integer ptsAdd = 10;
-    public Integer ptsMin = 10;
+    private final ArrayList<String[]> ptsAL; // points tracker reference
+    public Integer ptsAdd = 10; // modifiable integer for points to add when add button is pressed
+    public Integer ptsMin = 10; // modifiable integer for points to remove when minus button is pressed
 
+    /**
+     * PointsAdapter class constructor
+     * @param ini points tracker reference
+     */
     public PointsAdapter(ArrayList<String[]> ini) {
         this.ptsAL = ini;
     }
 
+    /**
+     * Method responsible for generating the view of the item(s) within recycler view
+     */
     @NonNull
     @Override
     public PointsAdapter.Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -287,6 +341,9 @@ class PointsAdapter extends RecyclerView.Adapter<PointsAdapter.Viewholder>{
         };
     }
 
+    /**
+     * Method that modifies the item view base on tracker data
+     */
     @Override
     public void onBindViewHolder(@NonNull PointsAdapter.Viewholder holder, int position) {
         String[] tmp = this.ptsAL.get(position);
@@ -308,15 +365,26 @@ class PointsAdapter extends RecyclerView.Adapter<PointsAdapter.Viewholder>{
         });
     }
 
+    /**
+     * Method that returns total item count
+     * @return total item count within the "recycler list"
+     */
     @Override
     public int getItemCount() {
         return this.ptsAL.size();
     }
 
+    /**
+     * Viewholder (points tracker) that inherits from RecyclerView.ViewHolder
+     */
     public static class Viewholder extends RecyclerView.ViewHolder {
-        private final TextView pts, ply;
-        private final ImageButton pBtn, mBtn;
+        private final TextView pts, ply; // text views from card_pts
+        private final ImageButton pBtn, mBtn; // image buttons from card_pts
 
+        /**
+         * Constructor of Viewholder (points tracker) class
+         * @param itemView View
+         */
         public Viewholder(@NonNull View itemView) {
             super(itemView);
             this.pts = itemView.findViewById(R.id.card_pts_info);

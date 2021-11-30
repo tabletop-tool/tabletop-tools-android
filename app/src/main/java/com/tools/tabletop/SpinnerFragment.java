@@ -58,11 +58,6 @@ public class SpinnerFragment extends Fragment implements
 
     /**
      * Method called to initialize view graphics
-     *
-     * @param inflater LayoutInflater
-     * @param container nullable ViewGroup
-     * @param savedInstanceState nullable savedInstance
-     * @return initialized view layout for the fragment
      */
     @Nullable
     @Override
@@ -128,9 +123,6 @@ public class SpinnerFragment extends Fragment implements
 
     /**
      * Method called to initialize menu view graphics
-     *
-     * @param menu Menu
-     * @param inflater MenuInflater
      */
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
@@ -186,7 +178,6 @@ public class SpinnerFragment extends Fragment implements
 
     /**
      * method associated with the spinner button click action
-     * @param v View
      */
     @Override
     public void onClick(View v) {

@@ -1,5 +1,6 @@
 package com.tools.tabletop;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -25,14 +26,23 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.Objects;
 
+/**
+ * HistoryFragment that implements Fragment class that is associated with fragment_history
+ * @param <T> represent the data type of the history list
+ */
 public class HistoryFragment<T> extends Fragment {
-    private final int mode;
-    private RecyclerView rv;
-    private TextView tv;
+    private final int mode; // mode determining what history fragment it is
+    private RecyclerView rv; // recycler view
+    private TextView tv; // text view to notify user of empty list
 
-    private final ArrayList<T> history;
-    private T deleted;
+    private final ArrayList<T> history; // ArrayList containing history data
+    private T deleted; // reference to the most recently deleted item from history
 
+    /**
+     * Constructor for HistoryFragment class
+     * @param history ArrayList reference of the history data
+     * @param type history fragment type | 0 - coin , 1 - dice, 2 - spinner
+     */
     public HistoryFragment(ArrayList<T> history, int type) {
         super();
         this.history = history;
@@ -40,7 +50,13 @@ public class HistoryFragment<T> extends Fragment {
         this.mode = type;
     }
 
+    /**
+     * item touch helper for the recycler view
+     */
     private final ItemTouchHelper itTh = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+        /**
+         * method that marks the allowed movement for the recycler view
+         */
         @Override
         public int getMovementFlags(
                 @NonNull RecyclerView recyclerView,
@@ -51,6 +67,9 @@ public class HistoryFragment<T> extends Fragment {
             );
         }
 
+        /**
+         * method returns whether or not items within the recycler view can be moved around
+         */
         @Override
         public boolean onMove(
                 @NonNull RecyclerView recyclerView,
@@ -59,6 +78,10 @@ public class HistoryFragment<T> extends Fragment {
             return false;
         }
 
+        /**
+         * method responsible for the item swipe action, in this case just left and right for
+         * removal
+         */
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
             // code reference: https://youtu.be/Aup-aPj24eU
@@ -78,11 +101,10 @@ public class HistoryFragment<T> extends Fragment {
         }
     });
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
+    /**
+     * Method called to initialize view graphics
+     */
+    @SuppressWarnings("unchecked")
     @Nullable
     @Override
     public View onCreateView(
@@ -98,6 +120,7 @@ public class HistoryFragment<T> extends Fragment {
             tv.setText("");
         }
 
+        // set adapter base on the mode variable
         if (mode == 0) this.rv.setAdapter(
                 new CoinAdapter(this.getContext(), (ArrayList<Boolean>) this.history)
         );
@@ -116,12 +139,19 @@ public class HistoryFragment<T> extends Fragment {
         return v;
     }
 
+    /**
+     * Method called to initialize menu view graphics
+     */
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.history_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    /**
+     * method to be called when the clear button is pressed
+     */
+    @SuppressLint("NotifyDataSetChanged")
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("You sure you want to clear all history record(s)?");
@@ -131,7 +161,7 @@ public class HistoryFragment<T> extends Fragment {
 
         builder.setPositiveButton("Yes", (d, v) -> {
             history.clear();
-            rv.getAdapter().notifyDataSetChanged();
+            Objects.requireNonNull(rv.getAdapter()).notifyDataSetChanged();
             tv.setText(getString(R.string.aww_there_is_nothing_here));
         });
 
@@ -140,16 +170,29 @@ public class HistoryFragment<T> extends Fragment {
     }
 }
 
+/**
+ * CoinAdapter class inherits from RecyclerView.Adapter that deals with card_coin view within
+ * recycler view.
+ */
 class CoinAdapter extends RecyclerView.Adapter<CoinAdapter.Viewholder> {
 
-    private final ArrayList<Boolean> coinHis;
-    private final Context ctx;
+    private final ArrayList<Boolean> coinHis; // coin history ArrayList reference
+    private final Context ctx; // context
 
+    /**
+     * Constructor for CoinAdapter class
+     *
+     * @param ctx Context
+     * @param ini ArrayList of boolean
+     */
     public CoinAdapter(Context ctx, ArrayList<Boolean> ini) {
         this.coinHis = ini;
         this.ctx = ctx;
     }
 
+    /**
+     * Method responsible for generating the view of the item(s) within recycler view
+     */
     @NonNull
     @Override
     public CoinAdapter.Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -160,6 +203,9 @@ class CoinAdapter extends RecyclerView.Adapter<CoinAdapter.Viewholder> {
         return new Viewholder(view){};
     }
 
+    /**
+     * Method that modifies the item view base on history data
+     */
     @Override
     public void onBindViewHolder(@NonNull CoinAdapter.Viewholder holder, int position) {
         Boolean data = this.coinHis.get(position);
@@ -173,13 +219,24 @@ class CoinAdapter extends RecyclerView.Adapter<CoinAdapter.Viewholder> {
         }
     }
 
+    /**
+     * Method that returns total item count
+     * @return total item count within the "recycler list"
+     */
     @Override
     public int getItemCount() { return this.coinHis.size(); }
 
+    /**
+     * Coin Viewholder class inherit from RecyclerView.ViewHolder
+     */
     protected static class Viewholder extends RecyclerView.ViewHolder {
-        private final TextView result;
-        private final CardView bk;
+        private final TextView result; // text view from card_coin
+        private final CardView bk; // card view from card_coin
 
+        /**
+         * Constructor of Viewholder (coin) class
+         * @param itemView View
+         */
         public Viewholder(@NonNull View itemView) {
             super(itemView);
             this.result = itemView.findViewById(R.id.coin_result);
@@ -188,14 +245,25 @@ class CoinAdapter extends RecyclerView.Adapter<CoinAdapter.Viewholder> {
     }
 }
 
+/**
+ * DiceAdapter class inherits from RecyclerView.Adapter that deals with card_dice view within
+ * recycler view.
+ */
 class DiceAdapter extends RecyclerView.Adapter<DiceAdapter.Viewholder> {
 
-    private final ArrayList<int[]> diceHis;
+    private final ArrayList<int[]> diceHis; // dice history ArrayList reference
 
+    /**
+     * DiceAdapter class constructor
+     * @param ini dice history reference
+     */
     public DiceAdapter(ArrayList<int[]> ini) {
         this.diceHis = ini;
     }
 
+    /**
+     * Method responsible for generating the view of the item(s) within recycler view
+     */
     @NonNull
     @Override
     public DiceAdapter.Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -206,6 +274,10 @@ class DiceAdapter extends RecyclerView.Adapter<DiceAdapter.Viewholder> {
         return new Viewholder(view){};
     }
 
+    /**
+     * Method that modifies the item view base on history data
+     */
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull DiceAdapter.Viewholder holder, int position) {
         int[] data = this.diceHis.get(position);
@@ -214,12 +286,23 @@ class DiceAdapter extends RecyclerView.Adapter<DiceAdapter.Viewholder> {
         holder.range.setText(data[1] + " - " + data[2]);
     }
 
+    /**
+     * Method that returns total item count
+     * @return total item count within the "recycler list"
+     */
     @Override
     public int getItemCount() { return this.diceHis.size(); }
 
+    /**
+     * Viewholder (dice) that inherits from RecyclerView.ViewHolder
+     */
     protected static class Viewholder extends RecyclerView.ViewHolder {
-        private final TextView result, range;
+        private final TextView result, range; // text views from card_dice
 
+        /**
+         * Constructor of Viewholder (dice) class
+         * @param itemView View
+         */
         public Viewholder(@NonNull View itemView) {
             super(itemView);
             this.result = itemView.findViewById(R.id.dice_result);
@@ -228,14 +311,25 @@ class DiceAdapter extends RecyclerView.Adapter<DiceAdapter.Viewholder> {
     }
 }
 
+/**
+ * SpinAdapter class inherits from RecyclerView.Adapter that deals with card_spin view within
+ * recycler view.
+ */
 class SpinAdapter extends RecyclerView.Adapter<SpinAdapter.Viewholder> {
 
-    private final ArrayList<String[]> spinHis;
+    private final ArrayList<String[]> spinHis; // array list reference of the spinner history
 
+    /**
+     * SpinAdapter class constructor
+     * @param ini spinner history reference
+     */
     public SpinAdapter(ArrayList<String[]> ini) {
         this.spinHis = ini;
     }
 
+    /**
+     * Method responsible for generating the view of the item(s) within recycler view
+     */
     @NonNull
     @Override
     public SpinAdapter.Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -246,6 +340,10 @@ class SpinAdapter extends RecyclerView.Adapter<SpinAdapter.Viewholder> {
         return new Viewholder(view){};
     }
 
+    /**
+     * Method that modifies the item view base on history data
+     */
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull SpinAdapter.Viewholder holder, int position) {
         String[] data = this.spinHis.get(position);
@@ -256,14 +354,25 @@ class SpinAdapter extends RecyclerView.Adapter<SpinAdapter.Viewholder> {
         holder.point.setRotation(Float.parseFloat(data[0]));
     }
 
+    /**
+     * Method that returns total item count
+     * @return total item count within the "recycler list"
+     */
     @Override
     public int getItemCount() { return this.spinHis.size(); }
 
+    /**
+     * Viewholder (spinner) that inherits from RecyclerView.ViewHolder
+     */
     protected static class Viewholder extends RecyclerView.ViewHolder {
-        private final TextView result, label;
-        private final CardView bk;
-        private final ImageView point;
+        private final TextView result, label; // text views from card_spin
+        private final CardView bk; // card view from card_spin
+        private final ImageView point; // image view pointer from card_spin
 
+        /**
+         * Constructor of Viewholder (spinner) class
+         * @param itemView View
+         */
         public Viewholder(@NonNull View itemView) {
             super(itemView);
             this.result = itemView.findViewById(R.id.spin_result);

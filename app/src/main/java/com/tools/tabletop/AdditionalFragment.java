@@ -28,11 +28,6 @@ public class AdditionalFragment extends Fragment {
 
     /**
      * Method called to initialize view graphics
-     *
-     * @param inflater LayoutInflater
-     * @param container nullable ViewGroup
-     * @param savedInstanceState nullable savedInstance
-     * @return initialized view layout for the fragment
      */
     @SuppressLint({"ApplySharedPref", "SetTextI18n"})
     @Nullable
