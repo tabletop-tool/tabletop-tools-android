@@ -7,6 +7,9 @@ with history tracker for all previously mentioned features.
 * Click on the icons and buttons.
 * Swipe left to remove a card and swipe right to edit it! (No edit for history cards)
 
+## Download
+[Download the latest release here](https://github.com/tabletop-tool/tabletop-tools-android/releases/latest)
+
 ### Coin Flipper
 ![](./img/coin2.png)
 
