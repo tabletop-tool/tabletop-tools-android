@@ -111,7 +111,7 @@ public class SpinnerSetting extends Fragment {
             } else { // swipe right, editing portion
                 // code reference: https://youtu.be/eslYJArppnQ
 
-                createBuilder(pos).show();
+                createAddBuilder(pos).show();
             }
         }
     });
@@ -150,14 +150,31 @@ public class SpinnerSetting extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.spin_setting_menu, menu);
 
-        MenuItem add = menu.findItem(R.id.add_btn);
-        add.setOnMenuItemClickListener(x -> {
-            this.createBuilder(-1).show();
+        MenuItem help = menu.findItem(R.id.help_btn);
+        help.setOnMenuItemClickListener(x -> {
+            this.createHelpBuilder().show();
             return true;
         });
 
+        MenuItem add = menu.findItem(R.id.add_btn);
+        add.setOnMenuItemClickListener(x -> {
+            this.createAddBuilder(-1).show();
+            return true;
+        });
 
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    /**
+     *
+     * @return Help dialog AlertDialog.Builder
+     */
+    private AlertDialog.Builder createHelpBuilder() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Help").setMessage("Use the add (+) button to add a new spinner portion.\n\n" +
+                "Swipe a portion to the right to edit and swipe to the left to delete.");
+        builder.setNeutralButton("OK", null);
+        return builder;
     }
 
     /**
@@ -167,7 +184,7 @@ public class SpinnerSetting extends Fragment {
      * @return AlertDialog.Builder with info of param input or completely new
      */
     @SuppressLint("DefaultLocale")
-    private AlertDialog.Builder createBuilder(int position) {
+    private AlertDialog.Builder createAddBuilder(int position) {
         // calculating maximum input limit
         float limit = 0f;
         for (String[] i: this.data) limit += Float.parseFloat(i[2]);
